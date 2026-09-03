@@ -37,12 +37,6 @@ jobs:
       - name: Add .nojekyll
         run: touch release/wwwroot/.nojekyll
 
-      # index.html is checked in with base href="/" so local `dotnet run` works.
-      # Here we rewrite it to "/<repo-name>/" just for the deployed copy, using
-      # the actual repo name — so this never has to be edited by hand.
-      - name: Set base href for GitHub Pages
-        run: sed -i 's|<base href="/" />|<base href="/${{ github.event.repository.name }}/" />|' release/wwwroot/index.html
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

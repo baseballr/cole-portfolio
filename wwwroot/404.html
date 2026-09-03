@@ -8,7 +8,7 @@
         // https://github.com/rafgraph/spa-github-pages
         // This 404.html redirects deep links (e.g. /projects) back to index.html
         // with the path encoded in the query string, so Blazor's router can pick it up.
-        var pathSegmentsToKeep = 1; // number of segments in your repo name, e.g. /cole-portfolio/
+        var pathSegmentsToKeep = 0; // site is served from root under the custom domain
 
         var l = window.location;
         l.replace(
