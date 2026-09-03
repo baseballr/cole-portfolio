@@ -1,0 +1,39 @@
+@implements IDisposable
+
+<div class="hero-carousel" aria-hidden="true">
+    @for (int i = 0; i < Images.Count; i++)
+    {
+        var index = i;
+        <div class="hero-carousel-slide @(index == _activeIndex ? "active" : "")"
+             style="background-image:url('@Images[index]')"></div>
+    }
+    <div class="hero-carousel-overlay"></div>
+</div>
+
+@code {
+    /// <summary>Image paths (relative to wwwroot), shown in order and cross-faded.</summary>
+    [Parameter] public List<string> Images { get; set; } = new();
+
+    /// <summary>How long each slide stays up before crossfading to the next.</summary>
+    [Parameter] public int IntervalMs { get; set; } = 5000;
+
+    private int _activeIndex = 0;
+    private Timer? _timer;
+
+    protected override void OnInitialized()
+    {
+        if (Images.Count > 1)
+        {
+            _timer = new Timer(_ =>
+            {
+                _activeIndex = (_activeIndex + 1) % Images.Count;
+                InvokeAsync(StateHasChanged);
+            }, null, IntervalMs, IntervalMs);
+        }
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

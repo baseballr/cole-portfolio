@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cole — Software Engineer</title>
+    <meta name="description" content="Portfolio of Cole, a software engineer specializing in .NET, C#, React, and Azure." />
+    <!-- base href is "/" for local dev. The GitHub Actions workflow automatically
+         rewrites this to "/your-repo-name/" only in the published output for GitHub
+         Pages — you should never need to touch this by hand. -->
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <!-- Pairs with 404.html: decodes the redirected path back into a real URL
+         before Blazor's router initializes. Part of the GitHub Pages SPA fix. -->
+    <script type="text/javascript">
+        (function (l) {
+            if (l.search[1] === '/') {
+                var decoded = l.search.slice(1).split('&').map(function (s) {
+                    return s.replace(/~and~/g, '&');
+                }).join('?');
+                window.history.replaceState(null, null,
+                    l.pathname.slice(0, -1) + decoded + l.hash
+                );
+            }
+        }(window.location));
+    </script>
+    <!-- If you add any scoped CSS files, uncomment the following to load them
+    <link href="ColePortfolio.styles.css" rel="stylesheet" /> -->
+</head>
+
+<body>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>
