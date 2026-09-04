@@ -75,6 +75,30 @@ html, body {
     color: var(--accent);
 }
 
+/* Mobile menu toggle */
+.menu-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.35rem;
+    cursor: pointer;
+    display: none; /* shown on small screens */
+}
+
+/* Mobile nav collapsed state */
+.site-nav.open {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+/* Slightly larger hit target for links on mobile */
+.site-nav a {
+    padding: 0.25rem 0.35rem;
+}
+
 /* Main content */
 .content {
     flex: 1;
@@ -444,13 +468,35 @@ html, body {
     }
 
     .header-inner {
-        flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .menu-toggle {
+        display: block;
+        margin-right: 0.5rem;
+    }
+
+    /* Hide horizontal nav by default on small screens; will show when .open is applied */
+    .site-nav {
+        display: none;
+        width: 100%;
+    }
+
+    .site-nav a {
+        color: var(--text);
+        display: block;
+        padding: 0.5rem 0;
+        border-top: 1px solid var(--border);
     }
 
     .contact-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.25rem;
+    }
+
+    /* When the mobile menu is open, hide the brand to reduce clutter */
+    .site-header.menu-open .brand {
+        display: none;
     }
 }
