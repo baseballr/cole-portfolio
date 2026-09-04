@@ -3,7 +3,7 @@
 <div class="page">
     <header class="site-header @( _menuOpen ? "menu-open" : string.Empty)">
         <div class="header-inner">
-            <button class="menu-toggle" @onclick="ToggleMenu" aria-expanded="@_menuOpen" aria-label="Toggle navigation">?</button>
+            <button class="menu-toggle" @onclick="ToggleMenu" aria-expanded="@_menuOpen" aria-label="Toggle navigation">&#9776;</button>
             <a href="/" class="brand">Cole Spitzer<span class="accent">.</span></a>
             <nav class="site-nav @(_menuOpen ? "open" : string.Empty)">
                 <a href="/" @onclick="CloseMenu">About</a>
