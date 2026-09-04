@@ -1,5 +1,6 @@
 :root {
     --bg: #0f1115;
+    --bg-rgb: 15, 17, 21;
     --bg-elevated: #171a21;
     --border: #262a33;
     --text: #e8e9ec;
@@ -8,6 +9,23 @@
     --accent-soft: rgba(91, 156, 246, 0.12);
     --radius: 10px;
     --max-width: 860px;
+}
+:root[data-theme="light"] {
+    --bg: #f7f8fa;
+    --bg-elevated: #ffffff;
+    --border: #e1e4ea;
+    --text: #1a1c22;
+    --text-muted: #5b606b;
+    --accent: #2f6fd6;
+    --accent-soft: rgba(47, 111, 214, 0.1);
+}
+
+:root[data-theme="light"] .site-header {
+    background: rgba(247, 248, 250, 0.85);
+}
+
+:root[data-theme="light"] .loading-progress circle:last-child {
+    stroke: var(--accent);
 }
 
 * {
@@ -83,6 +101,26 @@ html, body {
     font-size: 1.35rem;
     cursor: pointer;
     display: none; /* shown on small screens */
+}
+
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 999px;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
 }
 
 /* Mobile nav collapsed state */
@@ -268,6 +306,24 @@ html, body {
 .timeline-item {
     position: relative;
     margin-bottom: 2.5rem;
+}
+.timeline-item {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.timeline-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+.timeline-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+}
 }
 
 .timeline-marker {
