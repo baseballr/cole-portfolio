@@ -1,5 +1,6 @@
 :root {
     --bg: #0f1115;
+    --bg-rgb: 15, 17, 21;
     --bg-elevated: #171a21;
     --border: #262a33;
     --text: #e8e9ec;
@@ -9,6 +10,24 @@
     --radius: 10px;
     --max-width: 860px;
 }
+
+    :root[data-theme="light"] {
+        --bg: #f7f8fa;
+        --bg-elevated: #ffffff;
+        --border: #e1e4ea;
+        --text: #1a1c22;
+        --text-muted: #5b606b;
+        --accent: #2f6fd6;
+        --accent-soft: rgba(47, 111, 214, 0.1);
+    }
+
+        :root[data-theme="light"] .site-header {
+            background: rgba(247, 248, 250, 0.85);
+        }
+
+        :root[data-theme="light"] .loading-progress circle:last-child {
+            stroke: var(--accent);
+        }
 
 * {
     box-sizing: border-box;
@@ -55,25 +74,25 @@ html, body {
     text-decoration: none;
 }
 
-.brand .accent {
-    color: var(--accent);
-}
+    .brand .accent {
+        color: var(--accent);
+    }
 
 .site-nav {
     display: flex;
     gap: 1.5rem;
 }
 
-.site-nav a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: color 0.15s ease;
-}
+    .site-nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.15s ease;
+    }
 
-.site-nav a:hover {
-    color: var(--accent);
-}
+        .site-nav a:hover {
+            color: var(--accent);
+        }
 
 /* Mobile menu toggle */
 .menu-toggle {
@@ -84,6 +103,26 @@ html, body {
     cursor: pointer;
     display: none; /* shown on small screens */
 }
+
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 999px;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+    .theme-toggle:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+    }
 
 /* Mobile nav collapsed state */
 .site-nav.open {
@@ -138,22 +177,39 @@ html, body {
     transition: opacity 1.2s ease-in-out;
 }
 
-.hero-carousel-slide.active {
-    opacity: 1;
-}
+    .hero-carousel-slide.active {
+        opacity: 1;
+    }
 
 .hero-carousel-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        180deg,
-        rgba(15, 17, 21, 0.65) 0%,
-        rgba(15, 17, 21, 0.82) 100%
-    );
+    background: linear-gradient( 180deg, rgba(15, 17, 21, 0.65) 0%, rgba(15, 17, 21, 0.82) 100% );
 }
 
-.eyebrow {
+/* Hero text/buttons are pinned to fixed light values, independent of theme,
+   since they always sit over a dark photo overlay. This is the single
+   source of truth for hero styling — don't add color rules for these
+   elements anywhere else. */
+.hero-content h1,
+.hero-content .hero-subtitle,
+.hero-content .btn-secondary {
+    color: #e8e9ec;
+}
+
+.hero-content .eyebrow {
     color: var(--accent);
+}
+
+.hero-content .btn-secondary {
+    border-color: rgba(232, 233, 236, 0.4);
+}
+
+    .hero-content .btn-secondary:hover {
+        border-color: #e8e9ec;
+    }
+
+.eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 0.85rem;
@@ -169,7 +225,6 @@ html, body {
 
 .hero-subtitle {
     font-size: 1.15rem;
-    color: var(--text-muted);
     max-width: 540px;
     margin: 0 0 2rem;
 }
@@ -189,10 +244,10 @@ html, body {
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
 
 .btn-primary {
     background: var(--accent);
@@ -211,19 +266,19 @@ html, body {
     border-top: 1px solid var(--border);
 }
 
-.section:first-child {
-    border-top: none;
-}
+    .section:first-child {
+        border-top: none;
+    }
 
-.section h1 {
-    font-size: 2.25rem;
-    margin: 0 0 0.5rem;
-}
+    .section h1 {
+        font-size: 2.25rem;
+        margin: 0 0 0.5rem;
+    }
 
-.section h2 {
-    font-size: 1.6rem;
-    margin: 0 0 1rem;
-}
+    .section h2 {
+        font-size: 1.6rem;
+        margin: 0 0 1rem;
+    }
 
 .section-intro {
     color: var(--text-muted);
@@ -245,17 +300,17 @@ html, body {
     padding: 1.25rem;
 }
 
-.skill-card h3 {
-    margin: 0 0 0.4rem;
-    font-size: 1rem;
-    color: var(--accent);
-}
+    .skill-card h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1rem;
+        color: var(--accent);
+    }
 
-.skill-card p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
+    .skill-card p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
 
 /* Timeline */
 .timeline {
@@ -268,6 +323,22 @@ html, body {
 .timeline-item {
     position: relative;
     margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+    .timeline-item.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+@media (prefers-reduced-motion: reduce) {
+    .timeline-item {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
 }
 
 .timeline-marker {
@@ -297,9 +368,9 @@ html, body {
     padding-left: 1.2rem;
 }
 
-.timeline-content ul li {
-    margin-bottom: 0.35rem;
-}
+    .timeline-content ul li {
+        margin-bottom: 0.35rem;
+    }
 
 /* Projects */
 .projects-grid {
@@ -317,15 +388,15 @@ html, body {
     flex-direction: column;
 }
 
-.project-card h3 {
-    margin: 0 0 0.5rem;
-}
+    .project-card h3 {
+        margin: 0 0 0.5rem;
+    }
 
-.project-card p {
-    color: var(--text-muted);
-    font-size: 0.92rem;
-    flex: 1;
-}
+    .project-card p {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        flex: 1;
+    }
 
 .tags {
     display: flex;
@@ -356,9 +427,9 @@ html, body {
     font-weight: 600;
 }
 
-.link:hover {
-    text-decoration: underline;
-}
+    .link:hover {
+        text-decoration: underline;
+    }
 
 /* Contact */
 .contact-links {
@@ -381,9 +452,9 @@ html, body {
     transition: border-color 0.15s ease;
 }
 
-.contact-item:hover {
-    border-color: var(--accent);
-}
+    .contact-item:hover {
+        border-color: var(--accent);
+    }
 
 .contact-label {
     color: var(--text-muted);
@@ -414,28 +485,28 @@ html, body {
     margin: 20vh auto 1rem;
 }
 
-.loading-progress circle {
-    fill: none;
-    stroke: var(--border);
-    stroke-width: 0.6rem;
-    transform-origin: 50% 50%;
-    transform: rotate(-90deg);
-}
+    .loading-progress circle {
+        fill: none;
+        stroke: var(--border);
+        stroke-width: 0.6rem;
+        transform-origin: 50% 50%;
+        transform: rotate(-90deg);
+    }
 
-.loading-progress circle:last-child {
-    stroke: var(--accent);
-    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-    transition: stroke-dasharray 0.05s ease-in-out;
-}
+        .loading-progress circle:last-child {
+            stroke: var(--accent);
+            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+            transition: stroke-dasharray 0.05s ease-in-out;
+        }
 
 .loading-progress-text {
     text-align: center;
     color: var(--text-muted);
 }
 
-.loading-progress-text:after {
-    content: var(--blazor-load-percentage-text, "Loading");
-}
+    .loading-progress-text:after {
+        content: var(--blazor-load-percentage-text, "Loading");
+    }
 
 #blazor-error-ui {
     background: #b32121;
@@ -450,12 +521,12 @@ html, body {
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
 
 /* Responsive */
 @media (max-width: 640px) {
@@ -482,12 +553,12 @@ html, body {
         width: 100%;
     }
 
-    .site-nav a {
-        color: var(--text);
-        display: block;
-        padding: 0.5rem 0;
-        border-top: 1px solid var(--border);
-    }
+        .site-nav a {
+            color: var(--text);
+            display: block;
+            padding: 0.5rem 0;
+            border-top: 1px solid var(--border);
+        }
 
     .contact-item {
         flex-direction: column;

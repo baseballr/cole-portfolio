@@ -1,5 +1,5 @@
-﻿
-@page "/employmenthistory"
+﻿@page "/employmenthistory"
+@inject IJSRuntime JS
 
 <section class="section">
     <h2>Jobs</h2>
@@ -64,6 +64,12 @@
     </div>
 </section>
 
-
-
-
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("scrollRevealInterop.init");
+        }
+    }
+}

@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@inject IJSRuntime JS
 
 <div class="page">
     <header class="site-header @( _menuOpen ? "menu-open" : string.Empty)">
@@ -12,6 +13,9 @@
                 <a href="/employmenthistory" @onclick="CloseMenu">Employment</a>
                 <a href="/contact" @onclick="CloseMenu">Contact</a>
             </nav>
+            <button class="theme-toggle" @onclick="ToggleTheme" aria-label="Toggle dark and light mode">
+                @((MarkupString)(_isDark ? "&#9728;" : "&#127769;"))
+            </button>
         </div>
     </header>
 
@@ -29,13 +33,31 @@
 
 @code {
     private bool _menuOpen = false;
+    private bool _isDark = true;
 
     private void ToggleMenu()
     {
         _menuOpen = !_menuOpen;
     }
+
     private void CloseMenu()
     {
         _menuOpen = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var current = await JS.InvokeAsync<string>("themeInterop.getTheme");
+            _isDark = current != "light";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        _isDark = !_isDark;
+        await JS.InvokeVoidAsync("themeInterop.setTheme", _isDark ? "dark" : "light");
     }
 }
