@@ -5,10 +5,10 @@
 <section class="section">
     <h1>Cole Spitzer — Summary</h1>
     <p class ="lead">
-    I'm a software engineer with 5 years of experience building production systems for government and insurance clients. With a strong background in C#, .NET, React, Azure, SQL, and legacy system modernization. Taking ownership of hard problems, keeping stakeholders in the loop, and shipping code that has been thoroughly tested. I enjoy solving complex technical challenges, and developing software that has a measurable impact on the business. I have years of experince in developing deploying and supporting projects. Going from new conecpt to production in months to years and then maintaing it.
+    I'm a software engineer with @yearsOfExperience() years of experience building production systems for government and insurance clients. With a strong background in C#, .NET, React, Azure, SQL, and legacy system modernization. I take ownership of hard problems, keep stakeholders in the loop, and ship code that has been thoroughly tested. I enjoy solving complex technical challenges, and developing software that has a measurable impact on the business. I have years of experince in developing deploying and supporting projects. Going from new conecpts to production in months/years and then maintaining it.
     </p>
     <p class="lead">
-    I'm passionate about writing clean, maintainable code and building applications that solve real problems for real users. I'm always looking to grow — whether that's picking up new frameworks,refining my architecture skills, or taking on more ownership within a team. I enjoy being on the bleeding edge of technology as well as using technologies that are tried and proven.
+    I'm passionate about writing clean, maintainable code, and building applications that solve real problems for real users. I'm always looking to grow — whether that's picking up new frameworks,refining my architecture skills, or taking on more ownership within a team. I enjoy being on the bleeding edge of technology as well as using technologies that are tried and proven.
     </p>
 </section>
 
@@ -36,7 +36,7 @@
                 </p>
                 <ul>
                     <li>Lead a 5-developer team delivering UI features and integrations for a 200-person modernization program.</li>
-                    <li>Developed 200+ C# APIs with sub-5s response objectives using reusable async patterns to avoid duplicate work.</li>
+                    <li>Developed 200+ C# APIs with sub 5 second responses using reusable async patterns to avoid duplicate work.</li>
                     <li>Built a data comparison ("wizards") tool that aggregates four government sources to help caseworkers process cases.</li>
                     <li>Designed workaround solutions for legacy databases to keep delivery on track when direct requests were infeasible.</li>
                     <li>Implemented a C# batch job that ingests and aggregates 103M+ rows and writes SFTP output under 8 minutes.</li>
@@ -171,4 +171,19 @@
     <p>Board of Trustees member at First Church Deland &middot; Current</p>
     <p>South Eastern Guide Dogs puppy trainer &middot; December 2018 - January 2020</p>
 </section>
+@code{
+    private int yearsOfExperience()
+    {
+        DateTime startDate = new DateTime(2021, 10, 1);
+        DateTime today = DateTime.Now;
+
+        int _yearsOfExperience = today.Year - startDate.Year;
+        if(today.Month < startDate.Month)
+        {
+            _yearsOfExperience--;
+        }
+        return _yearsOfExperience;
+    }
+
+}
 
