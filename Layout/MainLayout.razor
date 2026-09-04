@@ -1,14 +1,16 @@
 @inherits LayoutComponentBase
 
 <div class="page">
-    <header class="site-header">
+    <header class="site-header @( _menuOpen ? "menu-open" : string.Empty)">
         <div class="header-inner">
+            <button class="menu-toggle" @onclick="ToggleMenu" aria-expanded="@_menuOpen" aria-label="Toggle navigation">?</button>
             <a href="/" class="brand">Cole Spitzer<span class="accent">.</span></a>
-            <nav class="site-nav">
-                <a href="/">About</a>
-                <a href="/experience">Experience</a>
-                <a href="/projects">Projects</a>
-                <a href="/contact">Contact</a>
+            <nav class="site-nav @(_menuOpen ? "open" : string.Empty)">
+                <a href="/" @onclick="CloseMenu">About</a>
+                <a href="/experience" @onclick="CloseMenu">Experience</a>
+                <a href="/projects" @onclick="CloseMenu">Projects</a>
+                <a href="/employmenthistory" @onclick="CloseMenu">Employment</a>
+                <a href="/contact" @onclick="CloseMenu">Contact</a>
             </nav>
         </div>
     </header>
@@ -24,3 +26,16 @@
         </p>
     </footer>
 </div>
+
+@code {
+    private bool _menuOpen = false;
+
+    private void ToggleMenu()
+    {
+        _menuOpen = !_menuOpen;
+    }
+    private void CloseMenu()
+    {
+        _menuOpen = false;
+    }
+}
