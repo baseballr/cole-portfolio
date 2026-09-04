@@ -4,11 +4,11 @@
 
 <section class="section">
     <h1>Cole Spitzer — Summary</h1>
-    <p class ="lead">
-    I'm a software engineer with @yearsOfExperience() years of experience building production systems for government and insurance clients. With a strong background in C#, .NET, React, Azure, SQL, and legacy system modernization. I take ownership of hard problems, keep stakeholders in the loop, and ship code that has been thoroughly tested. I enjoy solving complex technical challenges, and developing software that has a measurable impact on the business. I have years of experince in developing deploying and supporting projects. Going from new conecpts to production in months/years and then maintaining it.
+    <p class="lead">
+        I'm a software engineer with @yearsOfExperience() years of experience building production systems for government and insurance clients, with a strong background in C#, .NET, React, Azure, SQL, and legacy system modernization. I take ownership of hard problems, keep stakeholders in the loop, and ship code that has been thoroughly tested. I enjoy solving complex technical challenges and developing software that has a measurable impact on the business — taking projects from new concepts to production, and then maintaining them long-term.
     </p>
     <p class="lead">
-    I'm passionate about writing clean, maintainable code, and building applications that solve real problems for real users. I'm always looking to grow — whether that's picking up new frameworks,refining my architecture skills, or taking on more ownership within a team. I enjoy being on the bleeding edge of technology as well as using technologies that are tried and proven.
+        I'm passionate about writing clean, maintainable code and building applications that solve real problems for real users. I'm always looking to grow — whether that's picking up new frameworks, refining my architecture skills, or taking on more ownership within a team. I enjoy working at the leading edge of technology as well as relying on tools that are tried and proven.
     </p>
 </section>
 
@@ -89,14 +89,14 @@
     <p>Board of Trustees member at First Church Deland &middot; Current</p>
     <p>South Eastern Guide Dogs puppy trainer &middot; December 2018 - January 2020</p>
 </section>
-@code{
+@code {
     private int yearsOfExperience()
     {
         DateTime startDate = new DateTime(2021, 10, 1);
         DateTime today = DateTime.Now;
 
         int _yearsOfExperience = today.Year - startDate.Year;
-        if(today.Month < startDate.Month)
+        if (today.Month < startDate.Month)
         {
             _yearsOfExperience--;
         }
@@ -104,4 +104,3 @@
     }
 
 }
-
