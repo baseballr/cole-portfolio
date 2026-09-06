@@ -483,16 +483,21 @@ html, body {
 }
 
 .project-details-wrapper {
-    max-height: 0;
-    overflow: hidden;
+    display: grid;
+    grid-template-rows: 0fr;
     opacity: 0;
-    transition: max-height 0.4s ease, opacity 0.3s ease;
+    transition: grid-template-rows 0.4s ease, opacity 0.3s ease;
 }
 
-    .project-details-wrapper.expanded {
-        max-height: 800px; /* generous ceiling above real content height */
-        opacity: 1;
-    }
+.project-details-wrapper.expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.project-details-wrapper > .project-details {
+    overflow: hidden;
+    min-height: 0;
+}
 
 .detail-step {
     opacity: 0;
