@@ -23,10 +23,86 @@
         </div>
 
         <div class="project-card">
+            <h3>Datamart</h3>
+            <p>
+                I built a batch job that would grab data from an Oracle DB and then ingest it into Excel files daily. This was used as a source of truth while we were migrating to a new system, and it was used by multiple teams to validate their work against the old system.
+            </p>
+
+            <button class="read-more" @onclick="ToggleDataMartDetails" aria-expanded="@showFLDCFDetails">
+                <span class="read-more-text">@((showFLDCFDetails) ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
+            </button>
+
+            @if (showDataMartDetails)
+            {
+                <div class="project-details">
+                    <h4>Problem</h4>
+                    <p>
+                        FLDCF needed a direct, inspectable relationship to the data being pulled from their systems. As a way to verify the pipeline was accurate and investigate quickly if something looked off, rather than trusting a black-box process.
+                    </p>
+
+                    <h4>Approach</h4>
+                    <p>
+                        I built a daily C# batch job that ingests and aggregates 108M+ rows, then writes the output to Excel workbooks. The format was requested by FLDCF's team so they could open and cross-reference directly without needing separate tools. Since Excel has a hard cap on rows per workbook, the job splits the data across multiple workbooks automatically to stay under that limit while keeping the output usable.
+                    </p>
+
+                    <h4>Tradeoff</h4>
+                    <p>
+                        Excel isn't the most scalable output format for this volume of data, but it was what FLDCF wanted. They needed something their team could open and audit themselves, not just a database they'd have to query. Optimizing for their ability to independently verify the data mattered more than optimizing for elegance.
+                    </p>
+
+                    <h4>Outcome</h4>
+                    <p>
+                        A daily pipeline that ingests and aggregates 108M+ rows and writes complete SFTP output in under 8 minutes, giving FLDCF a transparent, self-service way to validate the data instead of relying on trust in the pipeline.
+                    </p>
+                </div>
+            }
+
+            <div class="tags">
+                <span class="tag">C#</span>
+                <span class="tag">.NET</span>
+                <span class="tag">Batch</span>
+                <span class="tag">MSSQL</span>
+                <span class="tag">Oracle</span>
+            </div>
+        </div>
+
+        <div class="project-card">
             <h3>FLDCF Worker Portal</h3>
             <p>
                 Led the modernization of a legacy system into a new portal for FLDCF caseworkers to process assistance applications, migrating old code and databases to a modern framework and design. This became the foundation for the rest of a multi-year, multi-phase project.
             </p>
+
+            <button class="read-more" @onclick="ToggleFLDCFDetails" aria-expanded="@showFLDCFDetails">
+                <span class="read-more-text">@((showFLDCFDetails) ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
+            </button>
+
+            @if (showFLDCFDetails)
+            {
+                <div class="project-details">
+                    <h4>Problem</h4>
+                    <p>
+                        FLDCF caseworkers were running Medicaid, SNAP, and TANF applications through a legacy system with outdated code and databases. Requests were slow, workarounds were common, and the system was a bottleneck for a modernization effort spanning multiple teams.
+                    </p>
+
+                    <h4>Approach</h4>
+                    <p>
+                        I led a 5-developer team rebuilding the portal on a modern React front end backed by C#/.NET APIs, migrating data out of the legacy databases as part of a multi-year, multi-phase program. We were given React and .NET to make it all happen.
+                    </p>
+
+                    <h4>Tradeoff</h4>
+                    <p>
+                        We migrated incrementally, module-by-module, rather than performing a full cutover. This meant running both systems in parallel for a period. This was slower in the short term, but it ensured caseworkers never lost access mid-migration and that there was no loss of data.
+                    </p>
+
+                    <h4>Outcome</h4>
+                    <p>
+                        Delivered UI features and integrations for a 200-person modernization program; built async API patterns keeping response times under 5 seconds despite heavy legacy data dependencies.
+                    </p>
+                </div>
+            }
+
             <div class="tags">
                 <span class="tag">C#</span>
                 <span class="tag">.NET</span>
@@ -74,12 +150,53 @@
             <p>
                 Built a daily pipeline that ingests Qualys vulnerability data into MSSQL and surfaces it in a Power BI report for management and the security team — helping them prioritize and track server fixes.
             </p>
+            <button class="read-more" @onclick="ToggleQualysDetails" aria-expanded="@showFLDCFDetails">
+                <span class="read-more-text">@((showFLDCFDetails) ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
+            </button>
+            @if (showQualysReportDetails)
+            {
+                <div class="project-details">
+                    <h4>Problem</h4>
+                    <p>
+                        Security and management teams needed visibility into vulnerability data from Qualys, but the raw data wasn't in a form anyone could act on or prioritize against.
+                    </p>
+
+                    <h4>Approach</h4>
+                    <p>
+                        Built a daily ingestion pipeline into MSSQL using Azure Data Factory, then surfaced it through a Power BI report designed around what the security team actually needed to triage
+                    </p>
+                    <h4>Outcome</h4>
+                    <p>
+                        Gave management and the security team a daily, prioritized view of server vulnerabilities. Turning a manual review process into something they could act on quickly and create work items against.
+                    </p>
+                </div>
+            }
+
             <div class="tags">
                 <span class="tag">Power BI</span>
                 <span class="tag">Azure Data Factory</span>
                 <span class="tag">MSSQL</span>
-
             </div>
         </div>
     </div>
 </section>
+
+@code {
+    private bool showFLDCFDetails;
+    private bool showDataMartDetails;
+    private bool showQualysReportDetails;
+
+    private void ToggleFLDCFDetails()
+    {
+        showFLDCFDetails = !showFLDCFDetails;
+    }
+    private void ToggleDataMartDetails()
+    {
+        showDataMartDetails = !showDataMartDetails;
+    }
+    private void ToggleQualysDetails()
+    {
+        showQualysReportDetails = !showQualysReportDetails;
+    }
+}
