@@ -19,7 +19,7 @@
     <h2>About Me</h2>
 
     <p>
-        I’m @_currentAge years old, and I’m someone who enjoys spending time outdoors, taking on new challenges, and figuring out how things work. Whether I’m working on a project, learning something new, or trying to solve a problem that doesn’t have an obvious answer, I enjoy the process of digging in and finding a solution.
+        I’m @CurrentAge() years old, and I’m someone who enjoys spending time outdoors, taking on new challenges, and figuring out how things work. Whether I’m working on a project, learning something new, or trying to solve a problem that doesn’t have an obvious answer, I enjoy the process of digging in and finding a solution.
         I can be a little stubborn... or, depending on how you look at it, persistent. When something catches my interest or I’m faced with a problem I want to solve, I tend to dedicate myself to figuring it out. I don't like giving up simply because something is difficult or unfamiliar. I enjoy learning along the way, trying different approaches, and continuing until I have a better understanding of the problem.
     </p>
     <p>
@@ -64,5 +64,13 @@
         "images/carousel/cole4.jpg",
     };
 
-    private int _currentAge = DateTime.Now.Year - 2000;
+    private int CurrentAge()
+    {
+        if (DateTime.Now.Month > 1 || (DateTime.Now.Month == 1 && DateTime.Now.Day >= 3))
+        {
+            return DateTime.Now.Year - 2000;
+        }
+        return DateTime.Now.Year - 2000 - 1;
+        
+    }
 }
