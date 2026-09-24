@@ -199,11 +199,11 @@
 
     @if (NearbyLocation is not null && ActiveLocation is null)
     {
-        <button class="interact-prompt" @onclick="Interact"><span>↵</span> PRESS <strong>E</strong> OR TAP TO ENTER @NearbyLocation.Name</button>
+        <button class="interact-prompt" @onclick="Interact"><span class="prompt-keys"><span>↵</span> PRESS <strong>E</strong> TO ENTER</span><span class="prompt-touch">TAP TO ENTER</span> @NearbyLocation.Name</button>
     }
 
 
-    <div class="world-controls"><span data-short="WASD  DRIVE"><b>WASD</b> / <b>ARROWS</b> Drive</span><button @onclick="Interact" data-short="E  ENTER"><b>E</b> Interact</button><button @onclick="ToggleMinimap" data-short="M  MAP"><b>M</b> Map</button><button @onclick="ClosePanel" data-short="ESC  CLOSE"><b>ESC</b> Close</button><button @onclick="ReturnHome" data-short="R  HOME"><b>R</b> Return to home page</button></div>
+    <div class="world-controls"><span data-short="WASD  DRIVE" data-touch="DRAG TO DRIVE"><b>WASD</b> / <b>ARROWS</b> Drive</span><button @onclick="Interact" data-short="E  ENTER" data-touch="ENTER"><b>E</b> Interact</button><button @onclick="ToggleMinimap" data-short="M  MAP" data-touch="MAP"><b>M</b> Map</button><button @onclick="ClosePanel" data-short="ESC  CLOSE" data-touch="CLOSE"><b>ESC</b> Close</button><button @onclick="ReturnHome" data-short="R  HOME" data-touch="HOME"><b>R</b> Return to home page</button></div>
 </section>
 
 @code {
@@ -311,10 +311,11 @@
         }
     }
 
-    // Touch the truck and pull: it keeps driving toward the finger until released.
+    // Touch screens: touch the truck and pull; it keeps driving toward the finger until released.
     // Touch pointers are implicitly captured, so move/up events keep coming to the truck.
     private async Task StartDrag(PointerEventArgs args)
     {
+        if (args.PointerType == "mouse") return; // computers drive with WASD / arrows only
         StopDrag();
         _dragStart = (args.ClientX, args.ClientY);
         _dragX = _dragY = 0;
