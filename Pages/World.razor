@@ -6,6 +6,7 @@
 <section class="world-screen" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
     <div class="world-hud">
         <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span></div>
+        <button class="vehicle-switch" @onclick="SwitchVehicle" title="Switch vehicle (V)"><span>@Vehicle.Icon</span> @Vehicle.Name <b>⇄</b></button>
     </div>
 
     <div class="world-viewport" aria-label="Cole's World. Drive with WASD or arrow keys and press E near a location.">
@@ -39,8 +40,8 @@
                 </button>
             }
 
-            <div class="world-truck" style="@TruckStyle" aria-label="Your truck" @onpointerdown="StartDrag" @onpointermove="Drag" @onpointerup="StopDrag" @onpointercancel="StopDrag">
-                <span class="truck-cab"></span><span class="truck-bed"></span><i class="truck-wheel wheel-front"></i><i class="truck-wheel wheel-back"></i>
+            <div class="world-truck world-truck-@Vehicle.Id" style="@TruckStyle" aria-label="Your @Vehicle.Name" @onpointerdown="StartDrag" @onpointermove="Drag" @onpointerup="StopDrag" @onpointercancel="StopDrag">
+                <span class="truck-body"><span class="truck-bed"></span><span class="truck-cab"></span><span class="truck-hood"></span></span><i class="truck-wheel wheel-front"></i><i class="truck-wheel wheel-back"></i>
             </div>
         </div>
     </div>
@@ -288,6 +289,10 @@
     };
 
     private string CameraStyle => $"--player-x:{_playerX}px; --player-y:{_playerY}px";
+    // Drivable vehicles are the garage vehicles; starts in the F-150.
+    private int _vehicleIndex = 1;
+    private (string Id, string Name, string Icon) Vehicle => _garageVehicles[_vehicleIndex];
+    private void SwitchVehicle() => _vehicleIndex = (_vehicleIndex + 1) % _garageVehicles.Length;
     private string TruckStyle => $"left:{_playerX}px; top:{_playerY}px; --truck-angle:{_truckAngle}deg; --truck-scale:{(_truckFacingLeft ? -1 : 1)}";
     private WorldLocation? NearbyLocation => _locations.FirstOrDefault(IsNearby);
 
@@ -298,6 +303,7 @@
         if (key == "escape") { ClosePanel(); return; }
         if (key == "e") { Interact(); return; }
         if (key == "r") { ReturnHome(); return; }
+        if (key == "v") { SwitchVehicle(); return; }
         if (key is "arrowup" or "w" or "arrowdown" or "s" or "arrowleft" or "a" or "arrowright" or "d")
         {
             _pressedKeys.Add(key);

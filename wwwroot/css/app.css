@@ -693,7 +693,22 @@ body:has(.world-screen) .content { max-width: none; padding: 0; }
 .world-mountain { background: #648d80; clip-path: polygon(50% 0, 100% 100%, 0 100%); opacity: 0.92; position: absolute; z-index: 1; }.mountain-one { height: 310px; right: 130px; top: -20px; width: 480px; }.mountain-two { height: 210px; right: 0; top: 120px; width: 380px; }
 .world-tree-large { background: #287663; border: 8px solid #3c9274; border-radius: 50%; box-shadow: 5px 9px 0 rgba(30, 86, 71, 0.28); height: 48px; position: absolute; width: 48px; z-index: 3; }.world-tree-large::after { background: #7c6545; bottom: -17px; content: ""; height: 20px; left: 17px; position: absolute; width: 12px; z-index: -1; }
 .world-location { align-items: center; background: transparent; border: 0; color: #183333; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem; padding: 0.4rem; position: absolute; transform: translate(-50%, -50%); z-index: 8; }.location-building { align-items: center; background: #d66f4f; border: 4px solid #f5c384; border-radius: 8px; box-shadow: 7px 8px 0 rgba(34, 61, 53, 0.25); display: flex; font-size: 2.5rem; height: 86px; justify-content: center; transition: transform 0.18s ease, box-shadow 0.18s ease; width: 116px; }.world-location:hover .location-building, .location-active .location-building, .location-nearby .location-building { box-shadow: 0 0 0 7px rgba(255, 235, 159, 0.45), 7px 8px 0 rgba(34, 61, 53, 0.25); transform: translateY(-5px); }.location-name { background: #183333; color: #f8eaca; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; padding: 0.25rem 0.5rem; text-transform: uppercase; white-space: nowrap; }
-.world-truck { height: 48px; position: absolute; transform: translate(-50%, -50%); transition: left 0.12s ease-out, top 0.12s ease-out; width: 70px; z-index: 12; }.truck-cab { background: #e96f48; border: 3px solid #ffe0a4; border-radius: 4px 10px 10px 4px; height: 42px; position: absolute; right: 0; top: 3px; width: 42px; }.truck-cab::after { background: #a9d3c6; border: 2px solid #ffe0a4; border-radius: 2px; content: ""; height: 16px; left: 7px; position: absolute; top: 7px; width: 21px; }.truck-bed { background: #ba4f3e; border: 3px solid #ffe0a4; border-radius: 5px 2px 2px 5px; height: 30px; left: 0; position: absolute; top: 9px; width: 31px; }.truck-wheel { background: #203d3c; border: 3px solid #f1d397; border-radius: 50%; bottom: -5px; height: 13px; position: absolute; width: 13px; }.wheel-front { right: 8px; }.wheel-back { left: 7px; }
+/* F-150 side profile, facing right: bed, crew cab, hood. One cream outline wraps the whole body. */
+.world-truck { height: 44px; position: absolute; transform: translate(-50%, -50%); transition: left 0.12s ease-out, top 0.12s ease-out; width: 84px; z-index: 12; }
+.truck-body { filter: drop-shadow(2px 0 0 #ffe0a4) drop-shadow(-2px 0 0 #ffe0a4) drop-shadow(0 2px 0 #ffe0a4) drop-shadow(0 -2px 0 #ffe0a4); inset: 0 0 8px; position: absolute; }
+.truck-body::after { background: #7d3a2c; bottom: 0; content: ""; height: 5px; left: 1px; position: absolute; right: 1px; }
+.truck-bed, .truck-cab, .truck-hood { background: #e2653f; position: absolute; }
+.truck-bed { bottom: 0; box-shadow: inset 0 3px 0 #b94a33; height: 20px; left: 0; width: 30px; }
+.truck-cab { bottom: 0; clip-path: polygon(0 0, 74% 0, 100% 42%, 100% 100%, 0 100%); height: 34px; left: 29px; width: 32px; }
+.truck-cab::before, .truck-cab::after { background: #a9d3c6; content: ""; height: 11px; position: absolute; top: 5px; }
+.truck-cab::before { left: 3px; width: 11px; }
+.truck-cab::after { clip-path: polygon(0 0, 62% 0, 100% 100%, 0 100%); left: 16px; width: 13px; }
+.truck-hood { bottom: 0; clip-path: polygon(0 0, 82% 8%, 100% 38%, 100% 100%, 0 100%); height: 20px; left: 60px; width: 24px; }
+.truck-hood::before { background: #fff3b0; border-radius: 1px; content: ""; height: 4px; position: absolute; right: 1px; top: 8px; width: 5px; }
+.truck-hood::after { background: #e8e3d6; bottom: 0; content: ""; height: 7px; position: absolute; right: 0; width: 5px; }
+.truck-wheel { background: radial-gradient(circle, #c9c3b3 0 3px, #203d3c 3.5px); border: 2px solid #f1d397; border-radius: 50%; bottom: -4px; height: 17px; position: absolute; width: 17px; }
+.wheel-front { right: 9px; }
+.wheel-back { left: 8px; }
 /* The panel is always a full-screen interior (office, memory room, or home). */
 .world-panel { inset: 58px 0 42px; position: fixed; z-index: 40; }.panel-category { color: #c65b43; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }.world-panel h1 { color: #1a3937; font-family: Georgia, serif; font-size: 2.25rem; line-height: 1; margin: 0.55rem 0; text-transform: none; }
 .world-minimap { background: rgba(23, 46, 45, 0.95); border: 2px solid #f1d397; box-shadow: 8px 8px 0 rgba(16, 50, 45, 0.2); padding: 0.85rem; position: absolute; right: 1.5rem; top: 74px; width: 205px; z-index: 25; }.minimap-title { color: #f5d58f; display: flex; font-size: 0.68rem; font-weight: 800; justify-content: space-between; letter-spacing: 0.14em; }.minimap-title button { background: none; border: 0; color: #b7d1c5; cursor: pointer; font-size: 1.1rem; line-height: 0.7; }/* 100px square = the 1500px world at 1/15 (matches the positions in World.razor); zoom just enlarges it. */
@@ -809,3 +824,34 @@ body:has(.world-screen) .content { max-width: none; padding: 0; }
 .pinned-photo strong { font-family: Georgia, serif; font-size: 1rem; }
 .pinned-photo small { color: #536c61; font-size: 0.72rem; line-height: 1.4; margin-top: 0.25rem; }
 @media (max-width: 640px) { .garage-vehicle { flex-basis: 30%; padding: 0.6rem 0.3rem; } .garage-vehicle span { font-size: 1.8rem; } .garage-vehicle strong { font-size: 0.6rem; text-align: center; } }
+
+/* Vehicle switcher (HUD button / V key). The F-150 is the default drawing; these restyle the same parts. */
+.vehicle-switch { align-items: center; background: transparent; border: 1px solid rgba(245, 213, 143, 0.5); color: #f5d58f; cursor: pointer; display: flex; font: inherit; font-size: 0.7rem; font-weight: 800; gap: 0.45rem; letter-spacing: 0.08em; padding: 0.45rem 0.7rem; }
+.vehicle-switch span { font-size: 1.1rem; }
+.vehicle-switch b { color: #f59b54; }
+.vehicle-switch:hover { background: rgba(245, 213, 143, 0.12); }
+
+/* Bronco: boxy SUV, black soft top over the back, rear window, spare tire. */
+.world-truck-bronco { width: 76px; }
+.world-truck-bronco .truck-bed, .world-truck-bronco .truck-cab, .world-truck-bronco .truck-hood { background: #5b7f8c; }
+.world-truck-bronco .truck-bed { box-shadow: inset 0 6px 0 #1f2a2c; height: 34px; width: 26px; }
+.world-truck-bronco .truck-bed::before { background: #a9d3c6; content: ""; height: 11px; left: 6px; position: absolute; top: 8px; width: 16px; }
+.world-truck-bronco .truck-bed::after { background: radial-gradient(circle, #5b7f8c 0 3px, #203d3c 3.5px); border-radius: 50%; content: ""; height: 16px; left: -7px; position: absolute; top: 13px; width: 9px; }
+.world-truck-bronco .truck-cab { box-shadow: inset 0 6px 0 #1f2a2c; clip-path: polygon(0 0, 82% 0, 100% 30%, 100% 100%, 0 100%); left: 25px; }
+.world-truck-bronco .truck-cab::before, .world-truck-bronco .truck-cab::after { top: 8px; }
+.world-truck-bronco .truck-hood { clip-path: polygon(0 0, 90% 0, 100% 25%, 100% 100%, 0 100%); left: 56px; width: 20px; }
+.world-truck-bronco .truck-body::after { background: #2a3638; }
+
+/* Dirt bike: red plastics, black seat, fork with number plate, spoked wheels. */
+.world-truck-dirtbike { height: 40px; width: 58px; }
+.world-truck-dirtbike .truck-body::after { background: #3b4644; bottom: 4px; height: 11px; left: 20px; right: auto; width: 15px; }
+.world-truck-dirtbike .truck-bed { background: #1f2a2c; box-shadow: inset 0 -3px 0 #d8302f; clip-path: polygon(0 40%, 100% 0, 100% 100%, 10% 100%); bottom: 14px; height: 8px; left: 4px; width: 28px; }
+.world-truck-dirtbike .truck-cab { background: #d8302f; clip-path: polygon(0 30%, 70% 0, 100% 20%, 90% 100%, 0 100%); bottom: 12px; height: 12px; left: 28px; width: 16px; }
+.world-truck-dirtbike .truck-cab::before, .world-truck-dirtbike .truck-cab::after { display: none; }
+.world-truck-dirtbike .truck-hood { background: #c9c3b3; bottom: 4px; clip-path: none; height: 26px; left: 47px; transform: rotate(-22deg); transform-origin: bottom; width: 4px; }
+.world-truck-dirtbike .truck-hood::before { background: #f5ead2; border-radius: 2px; height: 9px; right: -3px; top: 2px; width: 7px; }
+.world-truck-dirtbike .truck-hood::after { display: none; }
+.world-truck-dirtbike .truck-wheel { background: repeating-conic-gradient(#203d3c 0 20deg, #8a8575 20deg 26deg); height: 18px; width: 18px; }
+.world-truck-dirtbike .wheel-front { right: 0; }
+.world-truck-dirtbike .wheel-back { left: 0; }
+@media (max-width: 640px) { .vehicle-switch { font-size: 0; gap: 0.3rem; padding: 0.35rem 0.5rem; } .vehicle-switch span, .vehicle-switch b { font-size: 1rem; } }
