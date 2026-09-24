@@ -1,5 +1,6 @@
 @page "/colesworld"
 @using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager Navigation
 
 <PageTitle>Cole's World</PageTitle>
 
@@ -206,7 +207,7 @@
         <button @onclick="() => MovePlayer(0, 20)" aria-label="Drive down">▼</button>
     </div>
 
-    <div class="world-controls"><span><b>WASD</b> / <b>ARROWS</b> Drive</span><span><b>E</b> Interact</span><button @onclick="ToggleMinimap"><b>M</b> Map</button><span><b>ESC</b> Close</span></div>
+<div class="world-controls"><span><b>WASD</b> / <b>ARROWS</b> Drive</span><span><b>E</b> Interact</span><button @onclick="ToggleMinimap"><b>M</b> Map</button><span><b>ESC</b> Close</span><span><b>R</b> Return to home page</span></div>
 </section>
 
 @code {
@@ -229,17 +230,17 @@
     private readonly WorkStation[] _workStations =
     {
         new("Deloitte", "Deloitte", "Florida Department of Children and Families", "Caseworker platform", "Worked on modernizing a web application used by the department, including a data comparison tool that helps caseworkers process cases.", "▣", new[] { "C#", ".NET", "Blazor", "SQL", "Azure" }, new[]
-        {
+    {
             new WorkProject("wizards", "FLDCF Wizards", "Caseworker comparison tool", "Built a data comparison tool that aggregates government sources to help caseworkers process Medicaid, SNAP, and TANF applications.", "C# · .NET · Azure · React"),
             new WorkProject("datamart", "Datamart", "103M+ row data pipeline", "Built a daily batch job that aggregates data and writes complete SFTP output in under eight minutes for teams validating a system migration.", "C# · .NET · Batch · MSSQL · Oracle"),
             new WorkProject("portal", "FLDCF Worker Portal", "Modernization foundation", "Led a five-developer team delivering UI features and integrations for a multi-year modernization program.", "C# · .NET · React · Azure · MSSQL")
-        }),
+    }),
         new("brown", "B&B", "Brown & Brown", "Insurance systems", "Built applications supporting insurance brokers, secure file sharing, compliance automation, and modernized legacy systems.", "▣", new[] { "C#", ".NET", "React", "SQL", "Azure" }, new[]
-        {
+    {
             new WorkProject("eando", "Monthly E&O Survey", "Monthly compliance automation", "Conceptualized and developed a monthly compliance survey sent to more than 6,000 teammates to keep the company aligned with legal standards.", "Azure Logic Apps · C# · .NET · Power BI · Survey Monkey"),
             new WorkProject("qualys", "Qualys Report", "Security visibility pipeline", "Built a daily pipeline that ingests Qualys vulnerability data into MSSQL and surfaces it in Power BI so security leaders can prioritize fixes.", "Power BI · Azure Data Factory · MSSQL"),
             new WorkProject("jua", "JUA", "Secure file sharing", "Modernized a secure file-sharing site where users upload and download large files with granular security down to the file and folder level.", "Entra ID · C# · .NET · Blazor · Azure Blobs · MSSQL")
-        }),
+    }),
     };
 
     private readonly WorldMemory[] _worldMemories =
@@ -268,46 +269,46 @@
     private readonly List<WorldLocation> _locations = new()
     {
         new("home", "Home", "HOME BASE", "⌂", "Where the projects start", "Bought my first home in 2025. Outside of software development, I spend a lot of time working on projects around the house, from electrical work and landscaping to building things in the yard.", Array.Empty<string>(), new[]
-        {
+    {
             new WorldObject("Workshop", "⚒", "The place where house projects become weekend projects."),
             new WorldObject("Yard", "▱", "Landscaping, building, and a healthy amount of figuring it out as I go."),
             new WorldObject("2018 Honda CRF450R", "🏍", "One of my hobbies outside of software development."),
             new WorldObject("2022 Ford Bronco", "🚙", "Used for exploring, camping, hauling stuff, and generally getting into trouble."),
             new WorldObject("Tools", "⚒", "The right tool makes a hard project a lot more interesting."),
             new WorldObject("Computer", "▣", "Where the other kind of building happens.")
-        }, 300, 390),
+    }, 300, 390),
         new("work", "Software Engineering", "WORK", "▣", "Building systems that solve real problems", "A career built across government technology and insurance systems, leading teams, modernizing legacy applications, and carrying difficult work through to production.", new[] { "C#", ".NET", "React", "Blazor", "SQL", "Azure" }, new[]
-        {
+    {
             new WorldObject("Florida DCF", "▣", "Worked on modernizing a web application used by the department. C# · .NET · Blazor · SQL · Azure"),
             new WorldObject("Brown & Brown", "▣", "Built applications supporting insurance brokers and modernized legacy systems. C# · .NET · React · SQL · Azure"),
             new WorldObject("Azure", "☁", "Cloud services, data pipelines, API Management, Functions, and the infrastructure between an idea and production.")
-        }, 820, 300),
+    }, 820, 300),
         new("ski", "Ski Lodge", "HOBBY AREA", "⛷", "A little farther up the mountain", "Intermediate skier. Mostly East Coast. I enjoy exploring new mountains and pushing myself onto harder terrain.", Array.Empty<string>(), new[]
-        {
+    {
             new WorldObject("Skis", "⛷", "Leaning against the lodge and waiting for the next run.")
-        }, 1110, 165),
+    }, 1110, 165),
         new("camp", "Camping", "OUTDOORS", "⛺", "Away from the screen", "I enjoy getting outdoors and spending time away from a screen. Hammock camping is one of my favorites.", Array.Empty<string>(), new[]
-        {
+    {
             new WorldObject("Campfire", "🔥", "A good fire, a quiet night, and nowhere else to be."),
             new WorldObject("Hammock", "〰", "The preferred sleeping arrangement when the trees cooperate."),
             new WorldObject("Hiking Trail", "♧", "A trail out into the woods.")
-        }, 1110, 940),
+    }, 1110, 940),
         new("fishing", "Fishing Dock", "OUTDOORS", "♧", "A quiet place to cast a line", "Time outdoors is time well spent. Sometimes the best part is just sitting still long enough for the water to change.", Array.Empty<string>(), new[]
-        {
+    {
             new WorldObject("Kayak", "▱", "For when the dock is not quite far enough out."),
             new WorldObject("Fishing", "♧", "Patience is a skill that does not show up on a resume.")
-        }, 1280, 1130),
+    }, 1280, 1130),
         new("golf", "Sports", "INTERESTS", "⛳", "A few favorite teams and a moving target", "Sports, competition, and trying to improve one small piece at a time.", Array.Empty<string>(), new[]
-        {
+    {
             new WorldObject("FSU", "🏈", "Go Noles."),
             new WorldObject("Phillies", "⚾", "A lifelong baseball commitment."),
             new WorldObject("Golf", "⛳", "The goal is always to leave the course a little better than I found it.")
-        }, 430, 1110),
+    }, 430, 1110),
         new("church", "Church", "COMMUNITY", "✚", "A place to serve and gather", "Assistant Youth Director and Board of Trustees member at First Church Deland. Community, service, and showing up for the people around me matter outside of work too.", Array.Empty<string>(), new[]
-        {
+    {
             new WorldObject("Youth", "✚", "Assistant Youth Director, serving students and helping create a place to grow."),
             new WorldObject("Community", "⌂", "Board of Trustees member at First Church Deland.")
-        }, 650, 850)
+    }, 650, 850)
     };
 
     private string CameraTransform => $"transform: translate3d(-{CameraX}px, -{CameraY}px, 0);";
@@ -327,6 +328,7 @@
             _pressedKeys.Add(key);
             MoveFromPressedKeys();
         }
+        if(key == "r") { ReturnHome();return; }
     }
 
     private void HandleKeyUp(KeyboardEventArgs args) => _pressedKeys.Remove(args.Key.ToLowerInvariant());
@@ -374,6 +376,7 @@
     private bool HitsBuilding(int x, int y) => _locations.Any(location => x > location.X - 90 && x < location.X + 90 && y > location.Y - 70 && y < location.Y + 70);
     private bool IsNearby(WorldLocation location) => Math.Sqrt(Math.Pow(_playerX - location.X, 2) + Math.Pow(_playerY - location.Y, 2)) < 135;
     private void Interact() { if (NearbyLocation is not null) Inspect(NearbyLocation); }
+    private void ReturnHome() { Navigation.NavigateTo("/"); }
     private void Inspect(WorldLocation location)
     {
         _discoveredLocationIds.Add(location.Id);
