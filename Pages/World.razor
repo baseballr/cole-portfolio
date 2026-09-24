@@ -6,7 +6,6 @@
 <section class="world-screen" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true" @onclick="FocusWorld">
     <div class="world-hud">
         <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span></div>
-        <div class="world-status"><span class="status-pip"></span> EXPLORING <span class="world-coordinates">@_playerX:@_playerY</span></div>
     </div>
 
     <div class="world-viewport" aria-label="Cole's World. Drive with WASD or arrow keys and press E near a location.">
@@ -18,8 +17,11 @@
             <div class="world-road road-ski"></div>
             <div class="world-road road-church"></div>
             <div class="world-road road-golf"></div>
-            <div class="world-road road-camp"></div>
             <div class="world-road road-fishing"></div>
+            @foreach (var connection in _roadConnections)
+            {
+                <span class="world-road-connection" style="left:@($"{connection.X}px"); top:@($"{connection.Y}px")"></span>
+            }
             <div class="world-water water-one"></div>
             <div class="world-mountain mountain-one"></div>
             <div class="world-mountain mountain-two"></div>
@@ -32,7 +34,7 @@
             @foreach (var location in _locations)
             {
                 <button class="world-location @(IsNearby(location) ? "location-nearby" : string.Empty) @(ActiveLocation?.Id == location.Id ? "location-active" : string.Empty)" style="left:@($"{location.X}px"); top:@($"{location.Y}px")" @onclick="() => Inspect(location)" aria-label="Inspect @location.Name">
-                    <span class="location-building">@location.Icon</span>
+                    <span class="location-building location-building-@location.Id">@location.Icon</span>
                     <span class="location-name">@location.Name</span>
                 </button>
             }
@@ -134,25 +136,30 @@
                         }
                     </div>
                 }
-            @if (ActiveLocation.Id == "fishing")
+            @if (ActiveLocation.Id is "fishing" or "camp" or "church" or "golf" or "ski")
             {
-                <div class="dock-interior">
-                    <span class="panel-category">DOCK ACCESS / OUTDOORS</span>
-                    <p>Walk out onto the dock and browse a few favorite outdoor memories.</p>
-                    @if (SelectedFishingMemory is not null)
-                    {
-                        <figure class="dock-photo"><img src="@SelectedFishingMemory.ImagePath" alt="@SelectedFishingMemory.Alt" /><figcaption>@SelectedFishingMemory.Caption</figcaption></figure>
-                    }
-                    <div class="dock-gallery">
-                        @foreach (var memory in _fishingMemories)
+                <div class="life-interior-screen" @onclick:stopPropagation="true">
+                    <div class="life-topbar"><button @onclick="ClosePanel">← Back outside</button><span>@ActiveLocation.Name / MEMORY ROOM</span><strong>COLE'S WORLD</strong></div>
+                    <div class="life-scene life-scene-@ActiveLocation.Id">
+                        <div class="life-scene-title"><span>@ActiveLocation.Category</span><h1>@ActiveLocation.Name</h1><small>@ActiveLocation.Subtitle</small></div>
+                        <div class="life-set-piece life-set-piece-@ActiveLocation.Id" aria-hidden="true"></div>
+                        <div class="life-memory-board">
+                            <div class="life-board-heading"><span>MEMORY WALL</span><small>Select a memory to look closer.</small></div>
+                            <div class="life-memory-cards">
+                                @foreach (var memory in MemoriesFor(ActiveLocation.Id))
+                                {
+                                    <button class="life-memory-card @(SelectedWorldMemory?.ImagePath == memory.ImagePath ? "life-memory-selected" : string.Empty)" @onclick="() => SelectWorldMemory(memory)"><img src="@memory.ImagePath" alt="@memory.Alt" /><strong>@memory.Caption</strong></button>
+                                }
+                            </div>
+                        </div>
+                        @if (SelectedWorldMemory is not null)
                         {
-                            <button class="memory-button @(SelectedFishingMemory?.ImagePath == memory.ImagePath ? "memory-selected" : string.Empty)" @onclick="() => SelectFishingMemory(memory)"><img src="@memory.ImagePath" alt="@memory.Alt" /></button>
+                            <figure class="life-memory-display"><img src="@SelectedWorldMemory.ImagePath" alt="@SelectedWorldMemory.Alt" /><figcaption><span>MEMORY</span><strong>@SelectedWorldMemory.Caption</strong><small>@SelectedWorldMemory.Description</small></figcaption></figure>
                         }
                     </div>
                 </div>
             }
-            else
-            {
+
                 <p>@ActiveLocation.Description</p>
                 @if (ActiveLocation.Technologies.Count > 0)
                 {
@@ -162,7 +169,6 @@
                 {
                     <div class="panel-objects"><span class="panel-category">LOOK AROUND</span>@foreach (var item in ActiveLocation.Objects) { <button class="object-button @(ActiveObject?.Name == item.Name ? "object-selected" : string.Empty)" @onclick="() => InspectObject(item)"><span>@item.Icon</span><strong>@item.Name</strong><small>@(ActiveObject?.Name == item.Name ? item.Description : "Inspect")</small></button>}</div>
                 }
-            }
         </aside>
     }
 
@@ -171,7 +177,15 @@
         <div class="world-minimap" @onclick:stopPropagation="true">
             <div class="minimap-title">MINIMAP <button @onclick="ToggleMinimap" aria-label="Close minimap">×</button></div>
             <div class="minimap-world">
-                @foreach (var location in _locations.Where(location => _discoveredLocationIds.Contains(location.Id)))
+                <span class="minimap-road minimap-road-main"></span>
+                <span class="minimap-road minimap-road-home"></span>
+                <span class="minimap-road minimap-road-work"></span>
+                <span class="minimap-road minimap-road-ski"></span>
+                <span class="minimap-road minimap-road-church"></span>
+                <span class="minimap-road minimap-road-golf"></span>
+                <span class="minimap-road minimap-road-camp"></span>
+                <span class="minimap-road minimap-road-fishing"></span>
+                @foreach (var location in _locations)
                 {
                     <span class="minimap-location" style="left:@($"{location.X / 15}px"); top:@($"{location.Y / 15}px")">@location.Icon</span>
                 }
@@ -205,6 +219,7 @@
     private WorldObject? ActiveObject { get; set; }
     private WorkStation? SelectedWorkStation { get; set; }
     private FishingMemory? SelectedFishingMemory { get; set; }
+    private WorldMemory? SelectedWorldMemory { get; set; }
     private WorkProject? SelectedProject { get; set; }
     private bool ShowProjectLog { get; set; }
     private double _truckAngle;
@@ -227,18 +242,27 @@
         }),
     };
 
-    private readonly FishingMemory[] _fishingMemories =
+    private readonly WorldMemory[] _worldMemories =
     {
-        new("images/carousel/IMG_0273.jpg", "Cole outdoors", "OUTDOORS / A DAY OUTSIDE"),
-        new("images/carousel/IMG_3337.jpg", "Cole exploring outside", "EXPLORING / NEW PLACES"),
-        new("images/carousel/IMG_3386.jpg", "Cole on an outdoor adventure", "ADVENTURE / KEEP MOVING"),
-        new("images/carousel/IMG_3403.jpg", "Cole enjoying time away from a screen", "QUIET TIME / OUTDOORS")
+        new("fishing", "images/world/DogBeach.jpg", "Cole outdoors", "Dog Beach", "A quiet day outside, with time to slow down and enjoy being away from a screen."),
+        new("camp", "images/world/IMG_1357.jpg", "Cole on an outdoor adventure", "Camp life", "Hammock camping, open air, and a little distance from the usual routine."),
+        new("church", "images/world/GraysonConfirmation.jpg", "", "Community and service", "The confirmation into the church of one of my students!"),
+        new("church", "images/world/DirtBikeGrayson.jpg", "Cole with confirman", "Celebration", "Celebrating confirmation with my confirmee Grayson."),
+        new("golf", "images/world/NolesGame.jpg", "Cole at FSU", "Sports and competition", "A few favorite teams, and enjoying time with family."),
+        new("golf", "images/world/DirtBikeHump.jpg", "Cole Racing", "Sports and competition", "Aiming for first and tons of laughs."),
+        new("ski", "images/world/Skiing.jpg", "Cole on an adventure", "Skiing new terrain", "Intermediate skier, mostly East Coast, always looking for the next mountain."),
     };
 
     private readonly (int X, int Y)[] _trees =
     {
         (95, 180), (180, 230), (1380, 180), (1310, 260), (95, 910), (220, 1160),
         (1360, 880), (1280, 1260), (720, 115), (640, 1230), (1040, 1320), (360, 930)
+    };
+
+    private readonly (int X, int Y)[] _roadConnections =
+    {
+        (300, 650), (820, 650), (1110, 650), (650, 762), (430, 762), (1280, 762),
+        (1110, 762)
     };
 
     private readonly List<WorldLocation> _locations = new()
@@ -267,13 +291,13 @@
             new WorldObject("Campfire", "🔥", "A good fire, a quiet night, and nowhere else to be."),
             new WorldObject("Hammock", "〰", "The preferred sleeping arrangement when the trees cooperate."),
             new WorldObject("Hiking Trail", "♧", "A trail out into the woods.")
-        }, 1100, 940),
+        }, 1110, 940),
         new("fishing", "Fishing Dock", "OUTDOORS", "♧", "A quiet place to cast a line", "Time outdoors is time well spent. Sometimes the best part is just sitting still long enough for the water to change.", Array.Empty<string>(), new[]
         {
             new WorldObject("Kayak", "▱", "For when the dock is not quite far enough out."),
             new WorldObject("Fishing", "♧", "Patience is a skill that does not show up on a resume.")
         }, 1280, 1130),
-        new("golf", "Sports Club", "INTERESTS", "⛳", "A few favorite teams and a moving target", "Sports, competition, and trying to improve one small piece at a time.", Array.Empty<string>(), new[]
+        new("golf", "Sports", "INTERESTS", "⛳", "A few favorite teams and a moving target", "Sports, competition, and trying to improve one small piece at a time.", Array.Empty<string>(), new[]
         {
             new WorldObject("FSU", "🏈", "Go Noles."),
             new WorldObject("Phillies", "⚾", "A lifelong baseball commitment."),
@@ -358,7 +382,7 @@
         SelectedWorkStation = null;
         SelectedProject = null;
         ShowProjectLog = false;
-        SelectedFishingMemory = location.Id == "fishing" ? _fishingMemories[0] : null;
+        SelectedWorldMemory = MemoriesFor(location.Id).FirstOrDefault();
     }
     private void InspectObject(WorldObject item) => ActiveObject = item;
     private void SelectWorkStation(WorkStation station) { SelectedWorkStation = station; SelectedProject = null; ShowProjectLog = false; }
@@ -366,7 +390,9 @@
     private void ToggleProjectLog() { ShowProjectLog = !ShowProjectLog; SelectedProject = null; }
     private void SelectProject(WorkProject project) => SelectedProject = project;
     private void SelectFishingMemory(FishingMemory memory) => SelectedFishingMemory = memory;
-    private void ClosePanel() { ActiveLocation = null; ActiveObject = null; SelectedWorkStation = null; SelectedFishingMemory = null; SelectedProject = null; ShowProjectLog = false; }
+    private void SelectWorldMemory(WorldMemory memory) => SelectedWorldMemory = memory;
+    private IEnumerable<WorldMemory> MemoriesFor(string locationId) => _worldMemories.Where(memory => memory.LocationId == locationId);
+    private void ClosePanel() { ActiveLocation = null; ActiveObject = null; SelectedWorkStation = null; SelectedFishingMemory = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; }
     private void ToggleMinimap() => ShowMinimap = !ShowMinimap;
     private void FocusWorld() { }
     private void DiscoverNearby()
@@ -380,4 +406,5 @@
     private sealed record WorkStation(string Id, string ShortName, string Company, string Title, string Description, string Icon, IReadOnlyList<string> Technologies, IReadOnlyList<WorkProject> Projects);
     private sealed record WorkProject(string Id, string Title, string Summary, string Detail, string Technologies);
     private sealed record FishingMemory(string ImagePath, string Alt, string Caption);
+    private sealed record WorldMemory(string LocationId, string ImagePath, string Alt, string Caption, string Description);
 }
