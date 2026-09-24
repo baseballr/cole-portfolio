@@ -4,6 +4,7 @@ A personal portfolio site built with Blazor WebAssembly (.NET 8), deployed as a
 static site to GitHub Pages via GitHub Actions.
 
 ## Pages
+- **Cole's World** (`/`) — interactive top-down portfolio world with driveable locations
 - **About** (`/`) — bio and core skills
 - **Experience** (`/experience`) — Related Work Experience
 - **Employment History** (`/employmenthistory`) — All prior worked jobs
