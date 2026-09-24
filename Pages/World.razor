@@ -19,17 +19,19 @@
             <div class="world-road road-church"></div>
             <div class="world-road road-golf"></div>
             <div class="world-road road-fishing"></div>
+            <div class="world-road road-camp"></div>
             @foreach (var connection in _roadConnections)
             {
                 <span class="world-road-connection" style="left:@($"{connection.X}px"); top:@($"{connection.Y}px")"></span>
             }
+            <svg class="world-river" viewBox="0 0 1500 1500" aria-hidden="true"><path d="M1330 320 C1340 420 1440 470 1425 560 S1395 800 1435 900 S1415 1000 1395 1070" /></svg>
             <div class="world-water water-one"></div>
             <div class="world-mountain mountain-one"></div>
             <div class="world-mountain mountain-two"></div>
 
-            @foreach (var tree in _trees)
+            @foreach (var item in _scenery)
             {
-                <span class="world-tree-large" style="left:@($"{tree.X}px"); top:@($"{tree.Y}px")"></span>
+                <span class="scenery scenery-@item.Kind" style="left:@($"{item.X}px"); top:@($"{item.Y}px")"></span>
             }
 
             @foreach (var location in _locations)
@@ -258,10 +260,20 @@
         new("ski", "images/world/Skiing.jpg", "Cole on an adventure", "Skiing new terrain", "Intermediate skier, mostly East Coast, always looking for the next mountain."),
     };
 
-    private readonly (int X, int Y)[] _trees =
+    // Decorative map scenery, anchored at its base (X, Y). Kinds: oak, pine, bush, flowers, rock, reeds.
+    private readonly (int X, int Y, string Kind)[] _scenery =
     {
-        (95, 180), (180, 230), (1380, 180), (1310, 260), (95, 910), (220, 1160),
-        (1360, 880), (1280, 1260), (720, 115), (640, 1230), (1040, 1320), (360, 930)
+        (560, 100, "pine"), (640, 170, "pine"), (700, 120, "pine"), (960, 250, "pine"), (1010, 300, "pine"), (1200, 340, "pine"),
+        (1260, 380, "pine"), (1475, 330, "pine"), (1480, 420, "pine"),
+        (95, 180, "oak"), (180, 240, "oak"), (120, 520, "oak"), (470, 200, "oak"), (560, 450, "oak"), (990, 480, "oak"),
+        (95, 910, "oak"), (210, 1180, "oak"), (360, 930, "oak"), (820, 1010, "oak"), (900, 1250, "oak"), (640, 1260, "oak"),
+        (1340, 880, "oak"), (520, 1400, "oak"), (80, 1400, "oak"),
+        (200, 560, "bush"), (420, 540, "bush"), (700, 560, "bush"), (950, 580, "bush"), (1200, 560, "bush"), (160, 820, "bush"),
+        (520, 880, "bush"), (760, 880, "bush"), (980, 860, "bush"), (300, 1330, "bush"), (780, 1400, "bush"), (1000, 1420, "bush"),
+        (140, 380, "flowers"), (420, 420, "flowers"), (600, 330, "flowers"), (1330, 620, "flowers"), (500, 1000, "flowers"),
+        (860, 1150, "flowers"), (330, 1250, "flowers"), (700, 1350, "flowers"),
+        (1010, 430, "rock"), (1180, 250, "rock"), (560, 1100, "rock"), (980, 1150, "rock"),
+        (1375, 600, "reeds"), (1460, 860, "reeds"), (1125, 1120, "reeds"), (1140, 1250, "reeds")
     };
 
     // Patches over the main road's edge where a side road joins (roads are 86px wide including borders).
