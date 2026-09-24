@@ -1,16 +1,15 @@
 @page "/colesworld"
-@using Microsoft.AspNetCore.Components.Web
 @inject NavigationManager Navigation
 
 <PageTitle>Cole's World</PageTitle>
 
-<section class="world-screen" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true" @onclick="FocusWorld">
+<section class="world-screen" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
     <div class="world-hud">
         <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span></div>
     </div>
 
     <div class="world-viewport" aria-label="Cole's World. Drive with WASD or arrow keys and press E near a location.">
-        <div class="world-canvas" style="@CameraTransform">
+        <div class="world-canvas" style="@CameraStyle">
             <div class="world-sky"></div>
             <div class="world-road world-road-main"></div>
             <div class="world-road road-home"></div>
@@ -40,7 +39,7 @@
                 </button>
             }
 
-            <div class="world-truck" style="@TruckStyle" aria-label="Your truck">
+            <div class="world-truck" style="@TruckStyle" aria-label="Your truck" @onpointerdown="StartDrag" @onpointermove="Drag" @onpointerup="StopDrag" @onpointercancel="StopDrag">
                 <span class="truck-cab"></span><span class="truck-bed"></span><i class="truck-wheel wheel-front"></i><i class="truck-wheel wheel-back"></i>
             </div>
         </div>
@@ -49,127 +48,128 @@
     @if (ActiveLocation is not null)
     {
         <aside class="world-panel" @onclick:stopPropagation="true">
-            <button class="panel-close" @onclick="ClosePanel" aria-label="Close panel">×</button>
-            <span class="panel-category">@ActiveLocation.Category</span>
-            <h1>@ActiveLocation.Name</h1>
-            <p class="panel-place">@ActiveLocation.Subtitle</p>
-            <div class="panel-rule"></div>
             @if (ActiveLocation.Id == "work")
             {
-                <div class="work-interior">
-                    <span class="panel-category">SOFTWARE ENGINEERING / SELECT A CUBICLE</span>
-                    <div class="cubicle-room">
-                        @foreach (var station in _workStations)
-                        {
-                            <button class="cubicle @(SelectedWorkStation?.Id == station.Id ? "cubicle-selected" : string.Empty)" @onclick="() => SelectWorkStation(station)">
-                                <span class="cubicle-screen">@station.Icon</span><strong>@station.ShortName</strong><small>@station.Company</small>
-                            </button>
-                        }
-                    </div>
-                    @if (SelectedWorkStation is not null)
+                <div class="office-interior-screen">
+                    <div class="office-topbar"><button @onclick="ClosePanel">← Back outside</button><span>SOFTWARE ENGINEERING / @(SelectedWorkStation is null ? "OFFICE FLOOR" : "CUBICLE")</span><strong>WORK // BUILDING 01</strong></div>
+                    @if (SelectedWorkStation is null)
                     {
-                        <div class="station-detail">
-                            <span class="panel-category">@SelectedWorkStation.Company</span>
-                            <h2>@SelectedWorkStation.Title</h2>
-                            <p>@SelectedWorkStation.Description</p>
-                            <div class="panel-tech"><span>TECHNOLOGIES</span><div>@foreach (var technology in SelectedWorkStation.Technologies) { <b>@technology</b> }</div></div>
+                        <div class="office-room">
+                            <div class="office-sign"><span>COLE'S</span><strong>WORK</strong><small>SELECT A DOOR TO ENTER</small></div>
+                            <div class="office-floor"></div>
+                            <div class="office-doors">
+                                @foreach (var station in _workStations)
+                                {
+                                    <button class="office-door" @onclick="() => SelectWorkStation(station)">
+                                        <span class="door-number">0@(Array.IndexOf(_workStations, station) + 1)</span>
+                                        <span class="door-screen">@station.Icon</span>
+                                        <strong>@station.ShortName</strong>
+                                        <small>@station.Company</small>
+                                        <em>ENTER →</em>
+                                    </button>
+                                }
+                            </div>
+                            <p class="office-floor-note">A small office floor for the systems, people, and problems that shaped the work.</p>
                         </div>
                     }
                     else
                     {
-                        <p class="interior-hint">Three desks. Three chapters. Select a cubicle to see what was built there.</p>
+                        <div class="cubicle-inside">
+                            <button class="inside-back" @onclick="ClearWorkStation">← OFFICE FLOOR</button>
+                            <div class="cubicle-window"><span>NOW ENTERING</span><strong>@SelectedWorkStation.Company</strong><small>@SelectedWorkStation.Title</small></div>
+                            <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@ShowProjectLog"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div></div>
+                            @if (ShowProjectLog)
+                            {
+                                <div class="project-log-desk">
+                                    <div class="project-log-heading"><span>PROJECT LOG</span><strong>@SelectedWorkStation.Company</strong><small>Select a sheet to inspect the work.</small></div>
+                                    <div class="project-papers">
+                                        @foreach (var project in SelectedWorkStation.Projects)
+                                        {
+                                            <button class="project-paper @(SelectedProject?.Id == project.Id ? "paper-selected" : string.Empty)" @onclick="() => SelectProject(project)">
+                                                <span class="paper-pin"></span><strong>@project.Title</strong><small>@project.Summary</small><em>@project.Technologies</em>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                @if (SelectedProject is not null)
+                                {
+                                    <article class="project-monitor-detail"><div class="monitor-detail-bar"><span></span><span></span><span></span><small>PROJECT LOG // @SelectedWorkStation.ShortName</small></div><div class="monitor-detail-screen"><span class="panel-category">PROJECT DETAIL</span><h2>@SelectedProject.Title</h2><p>@SelectedProject.Detail</p><span class="paper-tech">@SelectedProject.Technologies</span></div></article>
+                                }
+                            }
+                            else
+                            {
+                                <article class="inside-data"><span class="panel-category">@SelectedWorkStation.Company</span><h1>@SelectedWorkStation.Title</h1><p>@SelectedWorkStation.Description</p><div class="inside-tech"><span>TECHNOLOGIES</span><div>@foreach (var technology in SelectedWorkStation.Technologies) { <b>@technology</b> }</div></div><p class="monitor-hint">Click the monitor to open the project log.</p></article>
+                            }
+                        </div>
                     }
                 </div>
             }
-                @if (ActiveLocation?.Id == "work")
-                {
-                    <div class="office-interior-screen" @onclick:stopPropagation="true">
-                        <div class="office-topbar"><button @onclick="ClosePanel">← Back outside</button><span>SOFTWARE ENGINEERING / @(SelectedWorkStation is null ? "OFFICE FLOOR" : "CUBICLE")</span><strong>WORK // BUILDING 01</strong></div>
-                        @if (SelectedWorkStation is null)
-                        {
-                            <div class="office-room">
-                                <div class="office-sign"><span>COLE'S</span><strong>WORK</strong><small>SELECT A DOOR TO ENTER</small></div>
-                                <div class="office-floor"></div>
-                                <div class="office-doors">
-                                    @foreach (var station in _workStations)
-                                    {
-                                        <button class="office-door" @onclick="() => SelectWorkStation(station)">
-                                            <span class="door-number">0@(Array.IndexOf(_workStations, station) + 1)</span>
-                                            <span class="door-screen">@station.Icon</span>
-                                            <strong>@station.ShortName</strong>
-                                            <small>@station.Company</small>
-                                            <em>ENTER →</em>
-                                        </button>
-                                    }
-                                </div>
-                                <p class="office-floor-note">A small office floor for the systems, people, and problems that shaped the work.</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="cubicle-inside">
-                                <button class="inside-back" @onclick="ClearWorkStation">← OFFICE FLOOR</button>
-                                <div class="cubicle-window"><span>NOW ENTERING</span><strong>@SelectedWorkStation.Company</strong><small>@SelectedWorkStation.Title</small></div>
-                                <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@ShowProjectLog"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div></div>
-                                @if (ShowProjectLog)
-                                {
-                                    <div class="project-log-desk">
-                                        <div class="project-log-heading"><span>PROJECT LOG</span><strong>@SelectedWorkStation.Company</strong><small>Select a sheet to inspect the work.</small></div>
-                                        <div class="project-papers">
-                                            @foreach (var project in SelectedWorkStation.Projects)
-                                            {
-                                                <button class="project-paper @(SelectedProject?.Id == project.Id ? "paper-selected" : string.Empty)" @onclick="() => SelectProject(project)">
-                                                    <span class="paper-pin"></span><strong>@project.Title</strong><small>@project.Summary</small><em>@project.Technologies</em>
-                                                </button>
-                                            }
-                                        </div>
-                                    </div>
-                                    @if (SelectedProject is not null)
-                                    {
-                                        <article class="project-monitor-detail"><div class="monitor-detail-bar"><span></span><span></span><span></span><small>PROJECT LOG // @SelectedWorkStation.ShortName</small></div><div class="monitor-detail-screen"><span class="panel-category">PROJECT DETAIL</span><h2>@SelectedProject.Title</h2><p>@SelectedProject.Detail</p><span class="paper-tech">@SelectedProject.Technologies</span></div></article>
-                                    }
-                                }
-                                else
-                                {
-                                    <article class="inside-data"><span class="panel-category">@SelectedWorkStation.Company</span><h1>@SelectedWorkStation.Title</h1><p>@SelectedWorkStation.Description</p><div class="inside-tech"><span>TECHNOLOGIES</span><div>@foreach (var technology in SelectedWorkStation.Technologies) { <b>@technology</b> }</div></div><p class="monitor-hint">Click the monitor to open the project log.</p></article>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-            @if (ActiveLocation.Id is "fishing" or "camp" or "church" or "golf" or "ski")
+            else if (ActiveLocation.Id is "fishing" or "camp" or "church" or "golf" or "ski")
             {
-                <div class="life-interior-screen" @onclick:stopPropagation="true">
+                <div class="life-interior-screen">
                     <div class="life-topbar"><button @onclick="ClosePanel">← Back outside</button><span>@ActiveLocation.Name / MEMORY ROOM</span><strong>COLE'S WORLD</strong></div>
                     <div class="life-scene life-scene-@ActiveLocation.Id">
                         <div class="life-scene-title"><span>@ActiveLocation.Category</span><h1>@ActiveLocation.Name</h1><small>@ActiveLocation.Subtitle</small></div>
                         <div class="life-set-piece life-set-piece-@ActiveLocation.Id" aria-hidden="true"></div>
-                        <div class="life-memory-board">
-                            <div class="life-board-heading"><span>MEMORY WALL</span><small>Select a memory to look closer.</small></div>
-                            <div class="life-memory-cards">
-                                @foreach (var memory in MemoriesFor(ActiveLocation.Id))
-                                {
-                                    <button class="life-memory-card @(SelectedWorldMemory?.ImagePath == memory.ImagePath ? "life-memory-selected" : string.Empty)" @onclick="() => SelectWorldMemory(memory)"><img src="@memory.ImagePath" alt="@memory.Alt" /><strong>@memory.Caption</strong></button>
-                                }
-                            </div>
-                        </div>
-                        @if (SelectedWorldMemory is not null)
-                        {
-                            <figure class="life-memory-display"><img src="@SelectedWorldMemory.ImagePath" alt="@SelectedWorldMemory.Alt" /><figcaption><span>MEMORY</span><strong>@SelectedWorldMemory.Caption</strong><small>@SelectedWorldMemory.Description</small></figcaption></figure>
-                        }
+                        @MemoryWall(ActiveLocation.Id)
                     </div>
                 </div>
             }
-
-                <p>@ActiveLocation.Description</p>
-                @if (ActiveLocation.Technologies.Count > 0)
-                {
-                    <div class="panel-tech"><span>TECHNOLOGIES</span><div>@foreach (var technology in ActiveLocation.Technologies) { <b>@technology</b> }</div></div>
-                }
-                @if (ActiveLocation.Objects.Count > 0)
-                {
-                    <div class="panel-objects"><span class="panel-category">LOOK AROUND</span>@foreach (var item in ActiveLocation.Objects) { <button class="object-button @(ActiveObject?.Name == item.Name ? "object-selected" : string.Empty)" @onclick="() => InspectObject(item)"><span>@item.Icon</span><strong>@item.Name</strong><small>@(ActiveObject?.Name == item.Name ? item.Description : "Inspect")</small></button>}</div>
-                }
+            else
+            {
+                <div class="home-interior-screen">
+                    <div class="office-topbar">@if (HomeRoom is null) { <button @onclick="ClosePanel">← Back outside</button> } else { <button @onclick="() => EnterHomeRoom(null)">← Front yard</button> }<span>HOME / @(HomeRoom switch { "garage" => "GARAGE", "house" => "INSIDE", _ => "FRONT YARD" })</span><strong>HOME BASE</strong></div>
+                    @if (HomeRoom is null)
+                    {
+                        <div class="home-front">
+                            <div class="home-front-title"><span>@ActiveLocation.Category</span><h1>@ActiveLocation.Name</h1><small>@ActiveLocation.Subtitle</small></div>
+                            <div class="house-facade">
+                                <div class="house-roof"></div>
+                                <div class="house-wall">
+                                    <span class="house-window" aria-hidden="true"></span>
+                                    <button class="house-door" @onclick='() => EnterHomeRoom("house")'><span>FRONT DOOR</span></button>
+                                    <button class="house-garage" @onclick='() => EnterHomeRoom("garage")'><span>GARAGE</span></button>
+                                </div>
+                            </div>
+                            <p class="home-front-note">Bought my first home in 2025. Outside of software development, I spend a lot of time working on projects around the house, from electrical work and landscaping to building things in the yard.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (HomeRoom == "house")
+                        {
+                            <div class="life-scene life-scene-house">
+                                <div class="life-scene-title"><span>INSIDE THE HOUSE</span><h1>Home</h1><small>A few of the moments that made it home.</small></div>
+                                @MemoryWall("house")
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="home-room home-room-garage">
+                                <div class="garage-vehicles">
+                                    @foreach (var vehicle in _garageVehicles)
+                                    {
+                                        <button class="garage-vehicle @(SelectedVehicle == vehicle.Id ? "garage-vehicle-selected" : string.Empty)" @onclick="() => SelectVehicle(vehicle.Id)"><span>@vehicle.Icon</span><strong>@vehicle.Name</strong></button>
+                                    }
+                                </div>
+                                @if (SelectedVehicle is null)
+                                {
+                                    <p class="garage-hint">Pick a ride to see the pictures pinned to the pegboard.</p>
+                                }
+                                else
+                                {
+                                    <div class="garage-pegboard">
+                                        @foreach (var memory in MemoriesFor(SelectedVehicle))
+                                        {
+                                            <figure class="pinned-photo"><span class="paper-pin"></span><img src="@memory.ImagePath" alt="@memory.Alt" /><figcaption><strong>@memory.Caption</strong><small>@memory.Description</small></figcaption></figure>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
         </aside>
     }
 
@@ -198,16 +198,11 @@
 
     @if (NearbyLocation is not null && ActiveLocation is null)
     {
-        <div class="interact-prompt"><span>↵</span> PRESS <strong>E</strong> TO ENTER @NearbyLocation.Name</div>
+        <button class="interact-prompt" @onclick="Interact"><span>↵</span> PRESS <strong>E</strong> OR TAP TO ENTER @NearbyLocation.Name</button>
     }
 
-    <div class="world-touch-controls" aria-label="Touch driving controls">
-        <button @onclick="() => MovePlayer(0, -20)" aria-label="Drive up">▲</button>
-        <div><button @onclick="() => MovePlayer(-20, 0)" aria-label="Drive left">◀</button><button @onclick="() => MovePlayer(20, 0)" aria-label="Drive right">▶</button></div>
-        <button @onclick="() => MovePlayer(0, 20)" aria-label="Drive down">▼</button>
-    </div>
 
-<div class="world-controls"><span><b>WASD</b> / <b>ARROWS</b> Drive</span><span><b>E</b> Interact</span><button @onclick="ToggleMinimap"><b>M</b> Map</button><span><b>ESC</b> Close</span><span><b>R</b> Return to home page</span></div>
+    <div class="world-controls"><span data-short="WASD  DRIVE"><b>WASD</b> / <b>ARROWS</b> Drive</span><button @onclick="Interact" data-short="E  ENTER"><b>E</b> Interact</button><button @onclick="ToggleMinimap" data-short="M  MAP"><b>M</b> Map</button><button @onclick="ClosePanel" data-short="ESC  CLOSE"><b>ESC</b> Close</button><button @onclick="ReturnHome" data-short="R  HOME"><b>R</b> Return to home page</button></div>
 </section>
 
 @code {
@@ -215,17 +210,19 @@
     private int _playerX = 300;
     private int _playerY = 650;
     private bool ShowMinimap;
-    private readonly HashSet<string> _discoveredLocationIds = new() { "home" };
     private WorldLocation? ActiveLocation { get; set; }
-    private WorldObject? ActiveObject { get; set; }
+    private string? HomeRoom { get; set; }
+    private string? SelectedVehicle { get; set; }
     private WorkStation? SelectedWorkStation { get; set; }
-    private FishingMemory? SelectedFishingMemory { get; set; }
     private WorldMemory? SelectedWorldMemory { get; set; }
     private WorkProject? SelectedProject { get; set; }
     private bool ShowProjectLog { get; set; }
     private double _truckAngle;
     private bool _truckFacingLeft;
     private readonly HashSet<string> _pressedKeys = new();
+    private CancellationTokenSource? _driving;
+    private (double X, double Y)? _dragStart;
+    private double _dragX, _dragY;
 
     private readonly WorkStation[] _workStations =
     {
@@ -250,7 +247,13 @@
         new("church", "images/world/GraysonConfirmation.jpg", "", "Community and service", "The confirmation into the church of one of my students!"),
         new("church", "images/world/DirtBikeGrayson.jpg", "Cole with confirman", "Celebration", "Celebrating confirmation with my confirmee Grayson."),
         new("golf", "images/world/NolesGame.jpg", "Cole at FSU", "Sports and competition", "A few favorite teams, and enjoying time with family."),
-        new("golf", "images/world/DirtBikeHump.jpg", "Cole Racing", "Sports and competition", "Aiming for first and tons of laughs."),
+        new("golf", "images/world/DirtbikeHump.jpg", "Cole Racing", "Sports and competition", "Aiming for first and tons of laughs."),
+        new("house", "images/world/FirstHome.jpg", "Cole in front of his first home", "My first home", "Bought my first home in 2025."),
+        new("house", "images/world/Proposal.jpg", "Cole proposing to his fiancée", "The proposal", "The day I asked my fiancée to marry me."),
+        new("bronco", "images/world/Bronco.jpg", "Cole driving his Bronco on an off-road trail", "2022 Ford Bronco", "Used for exploring, camping, hauling stuff, and generally getting into trouble."),
+        new("f150", "images/world/F150.jpg", "Cole's Ford F-150", "Ford F-150", ""),
+        new("dirtbike", "images/world/DirtbikeMud.JPG", "Cole racing his dirt bike through the mud", "2018 Honda CRF450R", "One of my hobbies outside of software development."),
+        new("dirtbike", "images/world/DirtbikeHump.jpg", "Cole racing his dirt bike", "Race day", "Aiming for first and tons of laughs."),
         new("ski", "images/world/Skiing.jpg", "Cole on an adventure", "Skiing new terrain", "Intermediate skier, mostly East Coast, always looking for the next mountain."),
     };
 
@@ -260,61 +263,32 @@
         (1360, 880), (1280, 1260), (720, 115), (640, 1230), (1040, 1320), (360, 930)
     };
 
+    // Patches over the main road's edge where a side road joins (roads are 86px wide including borders).
+    // Y covers the main road's 7px border and edge line: top edge at 650, bottom edge at 762 - 20px patch.
     private readonly (int X, int Y)[] _roadConnections =
     {
-        (300, 650), (820, 650), (1110, 650), (650, 762), (430, 762), (1280, 762),
-        (1110, 762)
+        (300, 650), (820, 650), (1110, 650), (650, 742), (430, 742), (1280, 742),
+        (1110, 742)
+    };
+
+    private readonly (string Id, string Name, string Icon)[] _garageVehicles =
+    {
+        ("bronco", "2022 Ford Bronco", "🚙"), ("f150", "Ford F-150", "🛻"), ("dirtbike", "2018 Honda CRF450R", "🏍")
     };
 
     private readonly List<WorldLocation> _locations = new()
     {
-        new("home", "Home", "HOME BASE", "⌂", "Where the projects start", "Bought my first home in 2025. Outside of software development, I spend a lot of time working on projects around the house, from electrical work and landscaping to building things in the yard.", Array.Empty<string>(), new[]
-    {
-            new WorldObject("Workshop", "⚒", "The place where house projects become weekend projects."),
-            new WorldObject("Yard", "▱", "Landscaping, building, and a healthy amount of figuring it out as I go."),
-            new WorldObject("2018 Honda CRF450R", "🏍", "One of my hobbies outside of software development."),
-            new WorldObject("2022 Ford Bronco", "🚙", "Used for exploring, camping, hauling stuff, and generally getting into trouble."),
-            new WorldObject("Tools", "⚒", "The right tool makes a hard project a lot more interesting."),
-            new WorldObject("Computer", "▣", "Where the other kind of building happens.")
-    }, 300, 390),
-        new("work", "Software Engineering", "WORK", "▣", "Building systems that solve real problems", "A career built across government technology and insurance systems, leading teams, modernizing legacy applications, and carrying difficult work through to production.", new[] { "C#", ".NET", "React", "Blazor", "SQL", "Azure" }, new[]
-    {
-            new WorldObject("Florida DCF", "▣", "Worked on modernizing a web application used by the department. C# · .NET · Blazor · SQL · Azure"),
-            new WorldObject("Brown & Brown", "▣", "Built applications supporting insurance brokers and modernized legacy systems. C# · .NET · React · SQL · Azure"),
-            new WorldObject("Azure", "☁", "Cloud services, data pipelines, API Management, Functions, and the infrastructure between an idea and production.")
-    }, 820, 300),
-        new("ski", "Ski Lodge", "HOBBY AREA", "⛷", "A little farther up the mountain", "Intermediate skier. Mostly East Coast. I enjoy exploring new mountains and pushing myself onto harder terrain.", Array.Empty<string>(), new[]
-    {
-            new WorldObject("Skis", "⛷", "Leaning against the lodge and waiting for the next run.")
-    }, 1110, 165),
-        new("camp", "Camping", "OUTDOORS", "⛺", "Away from the screen", "I enjoy getting outdoors and spending time away from a screen. Hammock camping is one of my favorites.", Array.Empty<string>(), new[]
-    {
-            new WorldObject("Campfire", "🔥", "A good fire, a quiet night, and nowhere else to be."),
-            new WorldObject("Hammock", "〰", "The preferred sleeping arrangement when the trees cooperate."),
-            new WorldObject("Hiking Trail", "♧", "A trail out into the woods.")
-    }, 1110, 940),
-        new("fishing", "Fishing Dock", "OUTDOORS", "♧", "A quiet place to cast a line", "Time outdoors is time well spent. Sometimes the best part is just sitting still long enough for the water to change.", Array.Empty<string>(), new[]
-    {
-            new WorldObject("Kayak", "▱", "For when the dock is not quite far enough out."),
-            new WorldObject("Fishing", "♧", "Patience is a skill that does not show up on a resume.")
-    }, 1280, 1130),
-        new("golf", "Sports", "INTERESTS", "⛳", "A few favorite teams and a moving target", "Sports, competition, and trying to improve one small piece at a time.", Array.Empty<string>(), new[]
-    {
-            new WorldObject("FSU", "🏈", "Go Noles."),
-            new WorldObject("Phillies", "⚾", "A lifelong baseball commitment."),
-            new WorldObject("Golf", "⛳", "The goal is always to leave the course a little better than I found it.")
-    }, 430, 1110),
-        new("church", "Church", "COMMUNITY", "✚", "A place to serve and gather", "Assistant Youth Director and Board of Trustees member at First Church Deland. Community, service, and showing up for the people around me matter outside of work too.", Array.Empty<string>(), new[]
-    {
-            new WorldObject("Youth", "✚", "Assistant Youth Director, serving students and helping create a place to grow."),
-            new WorldObject("Community", "⌂", "Board of Trustees member at First Church Deland.")
-    }, 650, 850)
+        new("home", "Home", "HOME BASE", "⌂", "Where the projects start", 300, 390),
+        new("work", "Software Engineering", "WORK", "▣", "Building systems that solve real problems", 820, 300),
+        new("ski", "Ski Lodge", "HOBBY AREA", "⛷", "A little farther up the mountain", 1110, 165),
+        new("camp", "Camping", "OUTDOORS", "⛺", "Away from the screen", 1110, 940),
+        new("fishing", "Fishing Dock", "OUTDOORS", "♧", "A quiet place to cast a line", 1280, 1130),
+        new("golf", "Sports", "INTERESTS", "⛳", "A few favorite teams and a moving target", 430, 1110),
+        new("church", "Church", "COMMUNITY", "✚", "A place to serve and gather", 650, 850)
     };
 
-    private string CameraTransform => $"transform: translate3d(-{CameraX}px, -{CameraY}px, 0);";
+    private string CameraStyle => $"--player-x:{_playerX}px; --player-y:{_playerY}px";
     private string TruckStyle => $"left:{_playerX}px; top:{_playerY}px; --truck-angle:{_truckAngle}deg; --truck-scale:{(_truckFacingLeft ? -1 : 1)}";
-    private int CameraX => Math.Clamp(_playerX - 450, 0, WorldSize - 900);
-    private int CameraY => Math.Clamp(_playerY - 360, 0, WorldSize - 720);
     private WorldLocation? NearbyLocation => _locations.FirstOrDefault(IsNearby);
 
     private void HandleKeyDown(KeyboardEventArgs args)
@@ -323,12 +297,45 @@
         if (key == "m") { ToggleMinimap(); return; }
         if (key == "escape") { ClosePanel(); return; }
         if (key == "e") { Interact(); return; }
+        if (key == "r") { ReturnHome(); return; }
         if (key is "arrowup" or "w" or "arrowdown" or "s" or "arrowleft" or "a" or "arrowright" or "d")
         {
             _pressedKeys.Add(key);
             MoveFromPressedKeys();
         }
-        if(key == "r") { ReturnHome();return; }
+    }
+
+    // Touch the truck and pull: it keeps driving toward the finger until released.
+    // Touch pointers are implicitly captured, so move/up events keep coming to the truck.
+    private async Task StartDrag(PointerEventArgs args)
+    {
+        StopDrag();
+        _dragStart = (args.ClientX, args.ClientY);
+        _dragX = _dragY = 0;
+        var driving = _driving = new CancellationTokenSource();
+        while (!driving.IsCancellationRequested)
+        {
+            var length = Math.Sqrt(_dragX * _dragX + _dragY * _dragY);
+            if (length > 12)
+            {
+                MovePlayer((int)Math.Round(_dragX / length * 20), (int)Math.Round(_dragY / length * 20));
+                StateHasChanged();
+            }
+            await Task.Delay(80);
+        }
+    }
+
+    private void Drag(PointerEventArgs args)
+    {
+        if (_dragStart is not { } start) return;
+        _dragX = args.ClientX - start.X;
+        _dragY = args.ClientY - start.Y;
+    }
+
+    private void StopDrag()
+    {
+        _dragStart = null;
+        _driving?.Cancel();
     }
 
     private void HandleKeyUp(KeyboardEventArgs args) => _pressedKeys.Remove(args.Key.ToLowerInvariant());
@@ -345,10 +352,6 @@
         if (x != 0 || y != 0)
         {
             var angle = Math.Atan2(y, x) * 180 / Math.PI;
-            // Normalize angle to -180 to 180 range
-            if (angle < -180) angle += 360;
-            if (angle > 180) angle -= 360;
-
             // If angle is between 90 and 180 (left-facing), flip the truck and mirror the angle
             if (angle > 90)
             {
@@ -368,9 +371,8 @@
         }
         var nextX = Math.Clamp(_playerX + x, 40, WorldSize - 40);
         var nextY = Math.Clamp(_playerY + y, 40, WorldSize - 40);
-        if (!HitsBuilding(nextX, nextY)) { _playerX = nextX; _playerY = nextY; DiscoverNearby(); }
+        if (!HitsBuilding(nextX, nextY)) { _playerX = nextX; _playerY = nextY; }
         ActiveLocation = null;
-        ActiveObject = null;
     }
 
     private bool HitsBuilding(int x, int y) => _locations.Any(location => x > location.X - 90 && x < location.X + 90 && y > location.Y - 70 && y < location.Y + 70);
@@ -379,35 +381,43 @@
     private void ReturnHome() { Navigation.NavigateTo("/"); }
     private void Inspect(WorldLocation location)
     {
-        _discoveredLocationIds.Add(location.Id);
         ActiveLocation = location;
-        ActiveObject = null;
+        HomeRoom = null;
         SelectedWorkStation = null;
         SelectedProject = null;
         ShowProjectLog = false;
         SelectedWorldMemory = MemoriesFor(location.Id).FirstOrDefault();
     }
-    private void InspectObject(WorldObject item) => ActiveObject = item;
-    private void SelectWorkStation(WorkStation station) { SelectedWorkStation = station; SelectedProject = null; ShowProjectLog = false; }
-    private void ClearWorkStation() { SelectedWorkStation = null; SelectedProject = null; ShowProjectLog = false; }
+    private void SelectVehicle(string id) => SelectedVehicle = id;
+    private void EnterHomeRoom(string? room) { HomeRoom = room; SelectedVehicle = null; SelectedWorldMemory = room is null ? null : MemoriesFor(room).FirstOrDefault(); }
+    private void SelectWorkStation(WorkStation? station) { SelectedWorkStation = station; SelectedProject = null; ShowProjectLog = false; }
+    private void ClearWorkStation() => SelectWorkStation(null);
     private void ToggleProjectLog() { ShowProjectLog = !ShowProjectLog; SelectedProject = null; }
     private void SelectProject(WorkProject project) => SelectedProject = project;
-    private void SelectFishingMemory(FishingMemory memory) => SelectedFishingMemory = memory;
     private void SelectWorldMemory(WorldMemory memory) => SelectedWorldMemory = memory;
     private IEnumerable<WorldMemory> MemoriesFor(string locationId) => _worldMemories.Where(memory => memory.LocationId == locationId);
-    private void ClosePanel() { ActiveLocation = null; ActiveObject = null; SelectedWorkStation = null; SelectedFishingMemory = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; }
-    private void ToggleMinimap() => ShowMinimap = !ShowMinimap;
-    private void FocusWorld() { }
-    private void DiscoverNearby()
-    {
-        var nearby = NearbyLocation;
-        if (nearby is not null) _discoveredLocationIds.Add(nearby.Id);
-    }
 
-    private sealed record WorldLocation(string Id, string Name, string Category, string Icon, string Subtitle, string Description, IReadOnlyList<string> Technologies, IReadOnlyList<WorldObject> Objects, int X, int Y);
-    private sealed record WorldObject(string Name, string Icon, string Description);
+    // Memory board + selected photo, shared by the memory rooms and the inside of the house.
+    private RenderFragment MemoryWall(string locationId) => @<div class="life-memory-wall">
+        <div class="life-memory-board">
+            <div class="life-board-heading"><span>MEMORY WALL</span><small>Select a memory to look closer.</small></div>
+            <div class="life-memory-cards">
+                @foreach (var memory in MemoriesFor(locationId))
+                {
+                    <button class="life-memory-card @(SelectedWorldMemory?.ImagePath == memory.ImagePath ? "life-memory-selected" : string.Empty)" @onclick="() => SelectWorldMemory(memory)"><img src="@memory.ImagePath" alt="@memory.Alt" /><strong>@memory.Caption</strong></button>
+                }
+            </div>
+        </div>
+        @if (SelectedWorldMemory is not null)
+        {
+            <figure class="life-memory-display"><img src="@SelectedWorldMemory.ImagePath" alt="@SelectedWorldMemory.Alt" /><figcaption><span>MEMORY</span><strong>@SelectedWorldMemory.Caption</strong><small>@SelectedWorldMemory.Description</small></figcaption></figure>
+        }
+    </div>;
+    private void ClosePanel() { ActiveLocation = null; HomeRoom = null; SelectedVehicle = null; SelectedWorkStation = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; }
+    private void ToggleMinimap() => ShowMinimap = !ShowMinimap;
+
+    private sealed record WorldLocation(string Id, string Name, string Category, string Icon, string Subtitle, int X, int Y);
     private sealed record WorkStation(string Id, string ShortName, string Company, string Title, string Description, string Icon, IReadOnlyList<string> Technologies, IReadOnlyList<WorkProject> Projects);
     private sealed record WorkProject(string Id, string Title, string Summary, string Detail, string Technologies);
-    private sealed record FishingMemory(string ImagePath, string Alt, string Caption);
     private sealed record WorldMemory(string LocationId, string ImagePath, string Alt, string Caption, string Description);
 }
