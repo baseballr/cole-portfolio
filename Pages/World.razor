@@ -4,7 +4,7 @@
 
 <PageTitle>Cole's World</PageTitle>
 
-<section @ref="_screen" class="world-screen world-@_timeOfDay" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
+<section @ref="_screen" class="world-screen world-@_timeOfDay season-@_season weather-@_weather" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
     <div class="world-hud">
         <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span>@if (_secrets.Count > 0) { <span class="secret-count" title="Secrets found">★ @_secrets.Count/@SecretNames.Count</span> }</div>
         <button class="vehicle-switch" @onclick="SwitchVehicle" title="Switch vehicle (V)"><span>@Vehicle.Icon</span> @Vehicle.Name <b>⇄</b></button>
@@ -93,6 +93,157 @@
                 </svg>
                 @if (_honking) { <span class="speech speech-fishers">Shh! The fish!</span> }
             </div>
+            <div class="cloud-shadow cloud-1"></div><div class="cloud-shadow cloud-2"></div><div class="cloud-shadow cloud-3"></div>
+
+            <div class="mailbox @(NearMailbox ? "mailbox-near" : string.Empty)" style="left:@($"{_mailbox.X}px"); top:@($"{_mailbox.Y}px")" @onclick="OpenMailbox" title="Contact Cole">
+                <span class="mailbox-sign">CONTACT</span>
+                <svg viewBox="0 0 34 44">
+                    <ellipse cx="17" cy="42.5" rx="12" ry="2" fill="rgba(30, 86, 71, 0.3)" />
+                    <rect x="14.5" y="20" width="5" height="23" fill="#7c6545" />
+                    <path d="M3 22 V13 a9 9 0 0 1 9 -9 h10 a9 9 0 0 1 9 9 v9 z" fill="#c65b43" />
+                    <path d="M3 22 V13 a9 9 0 0 1 9 -9 v18 z" fill="#a8483a" />
+                    <rect x="0" y="11" width="11" height="7" fill="#fff8e6" transform="rotate(-18 5 14)" />
+                    <g class="mailbox-flag"><rect x="29" y="2" width="2.5" height="14" fill="#f6d18a" /><rect x="29" y="2" width="9" height="5" fill="#e56b6f" /></g>
+                </svg>
+            </div>
+
+            @switch (_season)
+            {
+                case "christmas":
+                    <div class="decor decor-lit" style="left:185px; top:440px">
+                        <svg viewBox="0 -2 50 72" width="50" height="72">
+                            <rect x="22" y="56" width="6" height="12" fill="#7c6545" />
+                            <polygon points="25,6 42,28 8,28" fill="#2e7a62" /><polygon points="25,6 42,28 25,28" fill="#225d4b" />
+                            <polygon points="25,16 45,42 5,42" fill="#2e7a62" /><polygon points="25,16 45,42 25,42" fill="#225d4b" />
+                            <polygon points="25,28 48,58 2,58" fill="#2e7a62" /><polygon points="25,28 48,58 25,58" fill="#225d4b" />
+                            <g class="xmas-bulbs"><circle cx="18" cy="24" r="2.4" fill="#e56b6f" /><circle cx="31" cy="21" r="2.4" fill="#5aa0c8" /><circle cx="14" cy="38" r="2.4" fill="#f6d18a" /><circle cx="34" cy="36" r="2.4" fill="#e56b6f" /><circle cx="22" cy="50" r="2.4" fill="#5aa0c8" /><circle cx="38" cy="52" r="2.4" fill="#f6d18a" /><circle cx="10" cy="53" r="2.4" fill="#e56b6f" /></g>
+                            <polygon points="25,0 27.4,5 33,5.4 28.6,8.8 30.2,14 25,11 19.8,14 21.4,8.8 17,5.4 22.6,5" fill="#f6d18a" />
+                            <rect x="30" y="61" width="9" height="8" fill="#d35f46" /><rect x="33.5" y="61" width="2" height="8" fill="#f6d18a" /><rect x="11" y="62" width="8" height="7" fill="#5aa0c8" /><rect x="14" y="62" width="2" height="7" fill="#fff0bc" />
+                        </svg>
+                    </div>
+                    <div class="decor" style="left:600px; top:610px">
+                        <svg viewBox="0 0 36 50" width="36" height="50">
+                            <ellipse cx="18" cy="48" rx="14" ry="2.5" fill="rgba(30, 86, 71, 0.3)" />
+                            <line x1="11" y1="22" x2="2" y2="16" stroke="#7c6545" stroke-width="1.5" /><line x1="25" y1="22" x2="34" y2="17" stroke="#7c6545" stroke-width="1.5" />
+                            <circle cx="18" cy="38" r="10" fill="#f4f7f8" /><circle cx="18" cy="23" r="7.5" fill="#f4f7f8" /><circle cx="18" cy="11" r="6" fill="#f4f7f8" />
+                            <circle cx="18" cy="22" r="0.9" fill="#1f2d33" /><circle cx="18" cy="27" r="0.9" fill="#1f2d33" />
+                            <rect x="11" y="16" width="14" height="3" rx="1.5" fill="#d35f46" /><rect x="20" y="17" width="3" height="8" fill="#d35f46" />
+                            <circle cx="16" cy="10" r="0.9" fill="#1f2d33" /><circle cx="20" cy="10" r="0.9" fill="#1f2d33" /><polygon points="18,12 25,13 18,14" fill="#f59b54" />
+                            <rect x="12" y="1" width="12" height="5" fill="#1f2d33" /><rect x="10" y="5.5" width="16" height="1.8" fill="#1f2d33" />
+                        </svg>
+                    </div>
+                    break;
+                case "halloween":
+                    @foreach (var (x, y) in new[] { (232, 470), (718, 875), (1045, 965) })
+                    {
+                        <div class="decor decor-lit" style="left:@($"{x}px"); top:@($"{y}px")">
+                            <svg viewBox="0 0 28 24" width="28" height="24">
+                                <ellipse cx="14" cy="14" rx="13" ry="9.5" fill="#e88a3a" /><ellipse cx="14" cy="14" rx="7" ry="9.5" fill="#f59b54" /><ellipse cx="14" cy="14" rx="2.5" ry="9.5" fill="#e88a3a" />
+                                <rect x="12.5" y="2" width="3" height="4.5" rx="1" fill="#5d7a3a" />
+                                <g class="pumpkin-face" fill="#ffd36b"><polygon points="7,11 11,11 9,8" /><polygon points="17,11 21,11 19,8" /><path d="M7 15 Q14 21 21 15 L18.5 16.5 L17 15.5 L14 17 L11 15.5 L9.5 16.5 Z" /></g>
+                            </svg>
+                        </div>
+                    }
+                    <div class="decor" style="left:545px; top:975px">
+                        <svg viewBox="0 0 70 36" width="70" height="36">
+                            <ellipse cx="35" cy="33" rx="33" ry="3" fill="rgba(30, 86, 71, 0.3)" />
+                            <path d="M4 33 V14 a9 9 0 0 1 18 0 V33 Z" fill="#9aa39a" /><path d="M26 33 V10 a10 10 0 0 1 20 0 V33 Z" fill="#b3bbb2" /><path d="M50 33 V16 a8 8 0 0 1 16 0 V33 Z" fill="#9aa39a" />
+                            <text x="36" y="21" font-size="6" font-weight="800" text-anchor="middle" fill="#6b746b">RIP</text>
+                            <path d="M58 19 v9 M55 22 h6" stroke="#7d867d" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="decor decor-ghost" style="left:548px; top:945px">
+                        <svg viewBox="0 0 30 36" width="30" height="36">
+                            <path d="M3 34 V15 a12 12 0 0 1 24 0 V34 l-4 -3 -4 3 -4 -3 -4 3 -4 -3 z" fill="#f4f7f8" />
+                            <circle cx="11" cy="15" r="2" fill="#1f2d33" /><circle cx="19" cy="15" r="2" fill="#1f2d33" /><ellipse cx="15" cy="22" rx="2" ry="3" fill="#1f2d33" />
+                        </svg>
+                    </div>
+                    break;
+                case "thanksgiving":
+                    <div class="decor" style="left:960px; top:1025px">
+                        <svg viewBox="0 0 64 28" width="64" height="28">
+                            <rect x="2" y="8" width="30" height="18" rx="4" fill="#e3b95a" /><rect x="30" y="10" width="30" height="16" rx="4" fill="#d9a94a" />
+                            <path d="M2 14 H32 M2 20 H32 M30 16 H60 M30 21 H60" stroke="#b98a35" stroke-width="1.2" />
+                            <rect x="12" y="8" width="2" height="18" fill="#9a6440" /><rect x="44" y="10" width="2" height="16" fill="#9a6440" />
+                            <ellipse cx="50" cy="7" rx="6" ry="4.5" fill="#e88a3a" /><rect x="49" y="1" width="2" height="3" fill="#5d7a3a" />
+                        </svg>
+                    </div>
+                    <div class="decor" style="left:1010px; top:1010px">
+                        <svg viewBox="0 0 40 56" width="40" height="56">
+                            <rect x="19" y="20" width="3" height="36" fill="#7c6545" /><rect x="4" y="24" width="32" height="3" fill="#7c6545" />
+                            <path d="M4 24 l-3 2 m3 -2 l-3 -2 M36 24 l3 2 m-3 -2 l3 -2" stroke="#e3b95a" stroke-width="1.5" />
+                            <path d="M8 24 H32 L30 40 H10 Z" fill="#c65b43" /><path d="M10 30 H30 M11 35 H29 M16 24 V40 M24 24 V40" stroke="#8f3f30" stroke-width="1" />
+                            <circle cx="20" cy="15" r="7" fill="#e8d5a8" /><circle cx="17.5" cy="14" r="1" fill="#2a1d15" /><circle cx="22.5" cy="14" r="1" fill="#2a1d15" /><path d="M17 18 q3 2 6 0" stroke="#2a1d15" stroke-width="0.9" fill="none" />
+                            <path d="M8 10 H32 L26 7 L24 1 H16 L14 7 Z" fill="#9a6440" />
+                        </svg>
+                    </div>
+                    <div class="decor" style="left:140px; top:615px">
+                        <div class="decor-roam">
+                            <svg viewBox="0 0 36 32" width="36" height="32">
+                                <path d="M4 22 A14 14 0 0 1 32 22 Z" fill="#9a6440" /><path d="M7 22 A11 11 0 0 1 29 22 Z" fill="#d35f46" /><path d="M10 22 A8 8 0 0 1 26 22 Z" fill="#e3b56c" />
+                                <rect x="19.5" y="15" width="4" height="7" fill="#8a5a3c" /><ellipse cx="18" cy="24" rx="7" ry="6" fill="#6b4329" />
+                                <circle cx="22" cy="14" r="3.2" fill="#8a5a3c" /><circle cx="22.8" cy="13.3" r="0.7" fill="#1d140e" /><polygon points="25,13.5 28,14.5 25,15.5" fill="#f5c976" />
+                                <path d="M23 16 q1.5 3 -0.5 5" stroke="#d35f46" stroke-width="1.6" fill="none" /><path d="M16 29 v3 M20 29 v3" stroke="#e3b56c" stroke-width="1.4" />
+                            </svg>
+                        </div>
+                    </div>
+                    break;
+                case "easter":
+                    @for (var i = 0; i < _eggs.Length; i++)
+                    {
+                        var egg = i;
+                        if (_eggsFound.Contains(egg)) continue;
+                        <span class="decor easter-egg egg-@(egg % 3)" style="left:@($"{_eggs[egg].X}px"); top:@($"{_eggs[egg].Y}px")" @onclick="() => FindEgg(egg)">
+                            <svg viewBox="0 0 16 20" width="16" height="20">
+                                <ellipse cx="8" cy="11" rx="7" ry="9" class="egg-shell" />
+                                <path d="M1.5 9 q3.25 -2 6.5 0 t6.5 0" stroke="#fff" stroke-width="1.6" fill="none" /><path d="M1.2 14 q3.4 2 6.8 0 t6.8 0" stroke="#fff" stroke-width="1.6" fill="none" />
+                            </svg>
+                        </span>
+                    }
+                    <div class="decor" style="left:540px; top:965px">
+                        <div class="decor-roam decor-roam-wide">
+                            <svg class="bunny-hop" viewBox="0 0 30 34" width="30" height="34">
+                                <ellipse cx="15" cy="33" rx="11" ry="1.6" fill="rgba(30, 86, 71, 0.3)" />
+                                <ellipse cx="17" cy="25" rx="9" ry="7" fill="#f4f7f8" /><circle cx="25" cy="24" r="3" fill="#fff" />
+                                <ellipse cx="8" cy="7" rx="1.8" ry="5.5" fill="#f4f7f8" /><ellipse cx="12" cy="7" rx="1.8" ry="5.5" fill="#f4f7f8" transform="rotate(12 12 7)" />
+                                <ellipse cx="8" cy="7.5" rx="0.8" ry="3.8" fill="#f7a8c4" /><ellipse cx="12" cy="7.5" rx="0.8" ry="3.8" fill="#f7a8c4" transform="rotate(12 12 7)" />
+                                <circle cx="10" cy="17" r="5.5" fill="#f4f7f8" /><circle cx="8.5" cy="16.5" r="0.9" fill="#1f2d33" /><circle cx="5" cy="18.5" r="0.9" fill="#f7a8c4" />
+                                <ellipse cx="13" cy="31" rx="3" ry="1.5" fill="#e6eaec" /><ellipse cx="21" cy="31" rx="3" ry="1.5" fill="#e6eaec" />
+                            </svg>
+                        </div>
+                    </div>
+                    break;
+                case "summer":
+                    <div class="decor" style="left:1215px; top:1400px">
+                        <svg viewBox="0 0 130 120" width="180" height="166">
+                            <path d="M12 118 V44 M36 118 V44 M12 70 L36 90 M36 70 L12 90" stroke="#9aa39a" stroke-width="3" />
+                            <path d="M40 44 C70 58 84 22 124 14" stroke="#5aa0c8" stroke-width="11" fill="none" stroke-linecap="round" />
+                            <path class="slide-water" d="M40 44 C70 58 84 22 124 14" stroke="#bfe6f2" stroke-width="4" fill="none" stroke-dasharray="6 8" stroke-linecap="round" />
+                            <rect x="6" y="38" width="36" height="8" rx="2" fill="#f5c976" /><path d="M8 38 V30 H40 V38" stroke="#fff" stroke-width="2" fill="none" />
+                            <g><circle r="4.5" fill="#e36d3d" /><circle cy="-5" r="3" fill="#eab48c" />
+                                <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.55;0.8;1" path="M40 44 C70 58 84 22 124 14" />
+                                <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.8;0.82;1" dur="6s" repeatCount="indefinite" /></g>
+                            <circle cx="124" cy="14" r="4" fill="none" stroke="#fff" stroke-width="1.5">
+                                <animate attributeName="r" values="0;0;4;14" keyTimes="0;0.79;0.8;1" dur="6s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.79;0.8;1" dur="6s" repeatCount="indefinite" /></circle>
+                        </svg>
+                    </div>
+                    @foreach (var (x, y, color) in new[] { (1330, 1250, "#f7a8c4"), (1405, 1195, "#f5c976") })
+                    {
+                        <div class="decor decor-tube" style="left:@($"{x}px"); top:@($"{y}px")">
+                            <svg viewBox="0 0 30 18" width="30" height="18"><ellipse cx="15" cy="9" rx="12" ry="6" fill="none" stroke="@color" stroke-width="5" /><ellipse cx="15" cy="9" rx="12" ry="6" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="6 10" /></svg>
+                        </div>
+                    }
+                    <div class="decor" style="left:1050px; top:1300px">
+                        <svg viewBox="0 0 56 50" width="56" height="50">
+                            <rect x="4" y="36" width="30" height="12" rx="1" fill="#5aa0c8" /><path d="M4 40 H34 M4 44 H34" stroke="#fff" stroke-width="1.5" />
+                            <line x1="32" y1="16" x2="36" y2="46" stroke="#7c6545" stroke-width="2" />
+                            <path d="M10 18 Q31 -6 52 18 Z" fill="#e56b6f" /><path d="M24 18 Q31 1 38 18 Z" fill="#fff8e6" />
+                        </svg>
+                    </div>
+                    break;
+            }
+
 
             @foreach (var item in _scenery)
             {
@@ -102,7 +253,7 @@
             @foreach (var location in _locations)
             {
                 <button class="world-location @(IsNearby(location) ? "location-nearby" : string.Empty) @(ActiveLocation?.Id == location.Id ? "location-active" : string.Empty)" style="left:@($"{location.X}px"); top:@($"{location.Y}px")" @onclick="() => Inspect(location)" aria-label="Inspect @location.Name">
-                    <span class="location-building location-building-@location.Id">@location.Icon</span>
+                    <span class="location-building location-building-@location.Id">@location.Icon@if (_season == "christmas" && location.Id is "home" or "work" or "ski" or "church") { <span class="xmas-lights"></span> }</span>
                     <span class="location-name">@location.Name</span>
                 </button>
             }
@@ -125,6 +276,30 @@
                 <span class="truck-body"><span class="truck-bed"></span><span class="truck-cab"></span><span class="truck-hood"></span></span><i class="truck-wheel wheel-front"></i><i class="truck-wheel wheel-back"></i>
             </div>
         </div>
+        <div class="world-weather" aria-hidden="true"></div>
+        @if (_season == "christmas")
+        {
+            <div class="sky-sleigh" aria-hidden="true">
+                <svg viewBox="0 -4 160 48" width="160" height="48">
+                    <path d="M60 22 L108 20 M60 22 L136 18" stroke="#8a5a3c" stroke-width="1" />
+                    <g fill="#8a5a3c">
+                        <ellipse cx="112" cy="24" rx="9" ry="4.5" /><rect x="104" y="26" width="2" height="8" /><rect x="118" y="26" width="2" height="8" /><ellipse cx="123" cy="18" rx="3.5" ry="3" /><path d="M117 22 L122 17" stroke="#8a5a3c" stroke-width="3" />
+                        <ellipse cx="140" cy="22" rx="9" ry="4.5" /><rect x="132" y="24" width="2" height="8" /><rect x="146" y="24" width="2" height="8" /><ellipse cx="151" cy="16" rx="3.5" ry="3" /><path d="M145 20 L150 15" stroke="#8a5a3c" stroke-width="3" />
+                    </g>
+                    <path d="M122 15 l-2 -5 m2 5 l3 -5 M150 13 l-2 -5 m2 5 l3 -5" stroke="#6b4329" stroke-width="1.2" fill="none" /><circle cx="155" cy="16" r="1.6" fill="#e5484d" />
+                    <circle cx="26" cy="16" r="6" fill="#8a5a3c" />
+                    <circle cx="40" cy="16" r="7" fill="#d35f46" /><circle cx="40" cy="7" r="4" fill="#eab48c" /><path d="M36 8 Q40 15 44 8 Z" fill="#fff" /><path d="M36 5 L41 -1 L44 5 Z" fill="#d35f46" /><circle cx="41" cy="-1" r="1.2" fill="#fff" />
+                    <path d="M8 26 Q8 36 20 36 H58 Q64 36 64 28 V20 H30 Q24 20 22 26 Z" fill="#d35f46" /><path d="M6 40 H60 Q66 40 66 35" stroke="#f6d18a" stroke-width="2" fill="none" />
+                </svg>
+            </div>
+        }
+        @if (_season == "halloween")
+        {
+            @for (var bat = 0; bat < 3; bat++)
+            {
+                <svg class="sky-bat" viewBox="0 0 40 16" width="34" height="14" aria-hidden="true"><path class="bat-wings" d="M20 8 C16 2 10 2 2 6 C7 7 9 9 10 12 C13 9 16 9 20 11 C24 9 27 9 30 12 C31 9 33 7 38 6 C30 2 24 2 20 8 Z" fill="#2a1d2e" /></svg>
+            }
+        }
     </div>
 
     @if (ActiveLocation is not null)
@@ -308,6 +483,46 @@
         <button class="interact-prompt" @onclick="Interact"><span class="prompt-keys"><span>↵</span> PRESS <strong>E</strong> TO ENTER</span><span class="prompt-touch">TAP TO ENTER</span> @NearbyLocation.Name</button>
     }
 
+    @if (NearMailbox && ActiveLocation is null && !_showMailbox)
+    {
+        <button class="interact-prompt" @onclick="OpenMailbox"><span class="prompt-keys"><span>↵</span> PRESS <strong>E</strong> TO CHECK</span><span class="prompt-touch">TAP TO OPEN</span> Mailbox</button>
+    }
+
+    @if (_showMailbox)
+    {
+        <div class="welcome-backdrop" @onclick="CloseMailbox">
+            <div class="mail-letter" role="dialog" aria-labelledby="mail-title" @onclick:stopPropagation="true">
+                <span class="panel-category">You've got mail</span>
+                <h1 id="mail-title">Let's talk</h1>
+                <p>Thanks for driving around! I'm always happy to talk about software engineering roles, .NET and Azure work, or anything you spotted in here.</p>
+                <div class="mail-links">
+                    <a href="mailto:cole@colespitzer.com">✉ cole@colespitzer.com</a>
+                    <a href="https://www.linkedin.com/in/cole-spitzer-39945a1a5" target="_blank" rel="noopener">in &nbsp;Connect on LinkedIn</a>
+                    <a href="/resume/Cole-Spitzer-Resume.pdf" download>⬇ Download my résumé</a>
+                </div>
+                <button class="welcome-start" @onclick="CloseMailbox">Back to driving</button>
+            </div>
+        </div>
+    }
+
+    @if (_showWelcome)
+    {
+        <div class="welcome-backdrop">
+            <div class="welcome-card" role="dialog" aria-labelledby="welcome-title">
+                <span class="panel-category">Welcome</span>
+                <h1 id="welcome-title">This is Cole's World</h1>
+                <p>A playful side of my portfolio. Drive around to visit the places, people, and hobbies that make me who I am. Looking for my experience instead? It's one click away.</p>
+                <ul class="welcome-controls">
+                    <li><b>WASD</b> / <b>Arrows</b> drive &nbsp;·&nbsp; on phones, drag the truck</li>
+                    <li><b>E</b> enter a place &nbsp;·&nbsp; <b>ESC</b> back out</li>
+                    <li><b>M</b> map &nbsp;·&nbsp; <b>H</b> honk</li>
+                </ul>
+                <p class="welcome-tip">Tip: stop by the mailbox by my house to get in touch.</p>
+                <div class="welcome-actions"><button class="welcome-start" @onclick="DismissWelcome">Start exploring</button><a class="welcome-skip" href="/experience">Skip to résumé →</a></div>
+            </div>
+        </div>
+    }
+
     @if (_secretToast is not null)
     {
         <div class="secret-toast" role="status">@_secretToast</div>
@@ -442,6 +657,8 @@
     private void HandleKeyDown(KeyboardEventArgs args)
     {
         var key = args.Key.ToLowerInvariant();
+        if (_showWelcome) { if (key is "enter" or "escape" or "e" or " ") _ = DismissWelcome(); return; }
+        if (_showMailbox) { if (key is "enter" or "escape" or "e") CloseMailbox(); return; }
         if (key == "m") { ToggleMinimap(); return; }
         if (key == "escape") { GoBack(); return; }
         if (key == "e") { Interact(); return; }
@@ -539,7 +756,8 @@
     };
     private bool IsBlocked(int x, int y) =>
         _locations.Any(location => x > location.X - 90 && x < location.X + 90 && y > location.Y - 70 && y < location.Y + 70)
-        || new[] { _dog, _fishers }.Any(critter => Math.Abs(x - critter.X) < 70 && Math.Abs(y - critter.Y) < 55);
+        || new[] { _dog, _fishers }.Any(critter => Math.Abs(x - critter.X) < 70 && Math.Abs(y - critter.Y) < 55)
+        || (Math.Abs(x - _mailbox.X) < 28 && Math.Abs(y - (_mailbox.Y - 15)) < 30);
 
     // The dog perks up when the truck pulls in close (just outside her no-drive zone) or when she's clicked.
     private bool DogExcited => _dogPetted || (Math.Abs(_playerX - _dog.X) < 160 && Math.Abs(_playerY - _dog.Y) < 130);
@@ -597,9 +815,10 @@
         if (!firstRender) return;
         try
         {
+            _showWelcome = await JS.InvokeAsync<string?>("localStorage.getItem", "world-welcomed") is null;
             var saved = await JS.InvokeAsync<string?>("localStorage.getItem", "world-secrets");
             _secrets.UnionWith((saved ?? "").Split(',').Where(SecretNames.ContainsKey));
-            if (_secrets.Count > 0) StateHasChanged();
+            if (_secrets.Count > 0 || _showWelcome) StateHasChanged();
         }
         catch (JSException) { } // storage blocked: secrets just won't persist
     }
@@ -607,15 +826,83 @@
     private async Task FindSecret(string id)
     {
         if (!_secrets.Add(id)) return;
-        var toast = _secretToast = $"{SecretNames[id]} Secrets found: {_secrets.Count}/{SecretNames.Count}";
-        StateHasChanged();
         try { await JS.InvokeVoidAsync("localStorage.setItem", "world-secrets", string.Join(",", _secrets)); }
         catch (JSException) { }
+        await ShowToast($"{SecretNames[id]} Secrets found: {_secrets.Count}/{SecretNames.Count}");
+    }
+
+    private async Task ShowToast(string message)
+    {
+        var toast = _secretToast = message;
+        StateHasChanged();
         await Task.Delay(3500);
         if (_secretToast == toast) { _secretToast = null; StateHasChanged(); }
     }
+
+    // Welcome card shows once per browser; the mailbox letter holds the contact links.
+    private bool _showWelcome, _showMailbox;
+    private readonly (int X, int Y) _mailbox = (222, 610);
+    private bool NearMailbox => Math.Abs(_playerX - _mailbox.X) < 100 && Math.Abs(_playerY - _mailbox.Y) < 90;
+    private void OpenMailbox() => _showMailbox = true;
+    private void CloseMailbox() => _showMailbox = false;
+
+    private async Task DismissWelcome()
+    {
+        _showWelcome = false;
+        StateHasChanged();
+        try { await JS.InvokeVoidAsync("localStorage.setItem", "world-welcomed", "1"); }
+        catch (JSException) { } // storage blocked: the card just shows again next visit
+    }
+
+    // Seasons follow the visitor's date; ?season=christmas|halloween|thanksgiving|easter|summer|none previews one.
+    [SupplyParameterFromQuery(Name = "season")] public string? SeasonQuery { get; set; }
+    private static readonly string[] Seasons = { "christmas", "halloween", "thanksgiving", "easter", "summer", "none" };
+    private string _season = "none", _weather = "rain";
+
+    protected override void OnInitialized()
+    {
+        var today = DateTime.Today;
+        _season = SeasonQuery?.ToLowerInvariant() is { } requested && Seasons.Contains(requested) ? requested : SeasonFor(today);
+        _weather = _season switch { "christmas" => "snow", "halloween" or "thanksgiving" => "leaves", _ => today.Month is 1 or 2 ? "snow" : "rain" };
+    }
+
+    private static string SeasonFor(DateTime day)
+    {
+        var easter = EasterSunday(day.Year);
+        return day.Month switch
+        {
+            12 => "christmas",
+            10 => "halloween",
+            11 => "thanksgiving",
+            _ when day >= easter.AddDays(-14) && day <= easter.AddDays(1) => "easter",
+            6 or 7 or 8 => "summer",
+            _ => "none"
+        };
+    }
+
+    // Anonymous Gregorian algorithm (checked against 2019, 2024-2027).
+    private static DateTime EasterSunday(int year)
+    {
+        int a = year % 19, b = year / 100, c = year % 100, d = b / 4, e = b % 4, f = (b + 8) / 25, g = (b - f + 1) / 3;
+        int h = (19 * a + b - d - g + 15) % 30, i = c / 4, k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = (a + 11 * h + 22 * l) / 451;
+        return new DateTime(year, (h + l - 7 * m + 114) / 31, (h + l - 7 * m + 114) % 31 + 1);
+    }
+
+    // Easter egg hunt: six eggs hidden around the map while the Easter season is on.
+    private readonly (int X, int Y)[] _eggs = { (160, 300), (520, 300), (930, 420), (240, 880), (880, 1080), (720, 1180) };
+    private readonly HashSet<int> _eggsFound = new();
+
+    private async Task FindEgg(int egg)
+    {
+        if (!_eggsFound.Add(egg)) return;
+        await ShowToast(_eggsFound.Count == _eggs.Length ? "You found every Easter egg!" : $"Easter egg found! {_eggsFound.Count}/{_eggs.Length}");
+    }
     private bool IsNearby(WorldLocation location) => Math.Sqrt(Math.Pow(_playerX - location.X, 2) + Math.Pow(_playerY - location.Y, 2)) < 135;
-    private void Interact() { if (NearbyLocation is not null) Inspect(NearbyLocation); }
+    private void Interact()
+    {
+        if (NearMailbox) OpenMailbox();
+        else if (NearbyLocation is not null) Inspect(NearbyLocation);
+    }
     private void ReturnHome() { Navigation.NavigateTo("/"); }
     private void Inspect(WorldLocation location)
     {
@@ -655,7 +942,7 @@
     </div>;
     private ElementReference _screen;
     private string? _focusedLayer;
-    private string PanelLayer => $"{ActiveLocation?.Id}/{HomeRoom}/{SelectedWorkStation?.Id}/{ShowProjectLog}/{ShowTeamPhotos}/{SelectedProject?.Id}";
+    private string PanelLayer => $"{ActiveLocation?.Id}/{HomeRoom}/{SelectedWorkStation?.Id}/{ShowProjectLog}/{ShowTeamPhotos}/{SelectedProject?.Id}/{_showMailbox}/{_showWelcome}";
 
     // ESC backs out one layer at a time; only the top layer of a location closes the panel.
     private void GoBack()
