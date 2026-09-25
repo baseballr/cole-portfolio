@@ -345,7 +345,7 @@
             @foreach (var location in _locations)
             {
                 <button class="world-location @(IsNearby(location) ? "location-nearby" : string.Empty) @(ActiveLocation?.Id == location.Id ? "location-active" : string.Empty)" style="left:@($"{location.X}px"); top:@($"{location.Y}px")" @onclick="() => Inspect(location)" aria-label="Inspect @location.Name">
-                    <span class="location-building location-building-@location.Id">@location.Icon@if (_season == "christmas" && location.Id is "home" or "work" or "ski" or "church") { <span class="xmas-lights"></span> }</span>
+                    <span class="location-building location-building-@location.Id">@if (_season == "christmas" && location.Id is "home" or "work" or "ski" or "church") { <span class="xmas-lights"></span> }</span>
                     <span class="location-name">@location.Name</span>
                 </button>
             }
@@ -426,7 +426,7 @@
                         <div class="cubicle-inside">
                             <button class="inside-back" @onclick="ClearWorkStation">← OFFICE FLOOR</button>
                             <div class="cubicle-window"><span>NOW ENTERING</span><strong>@SelectedWorkStation.Company</strong><small>@SelectedWorkStation.Title</small></div>
-                            <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@ShowProjectLog"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div>@if (MemoriesFor(SelectedWorkStation.Id).FirstOrDefault() is { } framed) { <button class="inside-photo-frame" @onclick="ToggleTeamPhotos" aria-pressed="@ShowTeamPhotos"><img src="@framed.ImagePath" alt="" /><small>TEAM PHOTOS</small></button> }</div>
+                            <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@(ShowProjectLog ? "true" : "false")"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div>@if (MemoriesFor(SelectedWorkStation.Id).FirstOrDefault() is { } framed) { <button class="inside-photo-frame" @onclick="ToggleTeamPhotos" aria-pressed="@(ShowTeamPhotos ? "true" : "false")"><img src="@framed.ImagePath" alt="" /><small>TEAM PHOTOS</small></button> }</div>
                             @if (ShowProjectLog)
                             {
                                 <div class="project-log-desk">
@@ -589,7 +589,7 @@
                 <p>Thanks for driving around! I'm always happy to talk about software engineering roles, .NET and Azure work, or anything you spotted in here.</p>
                 <div class="mail-links">
                     <a href="mailto:cole@colespitzer.com">✉ cole@colespitzer.com</a>
-                    <a href="https://www.linkedin.com/in/cole-spitzer-39945a1a5" target="_blank" rel="noopener">in &nbsp;Connect on LinkedIn</a>
+                    <a href="https://www.linkedin.com/in/cole-spitzer-39945a1a5" target="_blank" rel="noopener noreferrer">in &nbsp;Connect on LinkedIn</a>
                     <a href="/resume/Cole-Spitzer-Resume.pdf" download>⬇ Download my résumé</a>
                 </div>
                 <button class="welcome-start" @onclick="CloseMailbox">Back to driving</button>
@@ -653,7 +653,7 @@
     }),
         new("brown", "B&B", "Brown & Brown", "Insurance systems", "Built applications supporting insurance brokers, secure file sharing, compliance automation, and modernized legacy systems.", "▣", new[] { "C#", ".NET", "React", "SQL", "Azure" }, new[]
     {
-            new WorkProject("eando", "Monthly E&O Survey", "Monthly compliance automation", "Conceptualized and developed a monthly compliance survey sent to more than 6,000 teammates to keep the company aligned with legal standards.", "Azure Logic Apps · C# · .NET · Power BI · Survey Monkey"),
+            new WorkProject("eando", "Monthly E&O Survey", "Monthly compliance automation", "Conceptualized and developed a monthly compliance survey sent to more than 6,000 teammates to keep the company aligned with legal standards.", "Azure Logic Apps · C# · .NET · Power BI · SurveyMonkey"),
             new WorkProject("qualys", "Qualys Report", "Security visibility pipeline", "Built a daily pipeline that ingests Qualys vulnerability data into MSSQL and surfaces it in Power BI so security leaders can prioritize fixes.", "Power BI · Azure Data Factory · MSSQL"),
             new WorkProject("jua", "JUA", "Secure file sharing", "Modernized a secure file-sharing site where users upload and download large files with granular security down to the file and folder level.", "Entra ID · C# · .NET · Blazor · Azure Blobs · MSSQL")
     }),
@@ -666,18 +666,18 @@
         new("fishing", "images/world/Cruise.JPG", "Cole on a catamaran", "Cruise Time!", "A day out on the water, enjoying the scenery and the ride."),
         new("fishing", "images/world/Kayak.jpg", "Cole kayaking at night", "Night paddle", "Out on the kayak after dark, when the water goes still."),
         
-        new("camp", ImagePath: "images/world/IMG_1357.jpg", "Cole on an outdoor adventure", "Camp life", "Hammock camping, open air, and a little distance from the usual routine."),
-        new("camp", ImagePath: "images/world/Acadia.JPG", "Cole on a hike", "Acadia National park", "Exploring the trails and enjoying the natural beauty of Acadia National Park."),
+        new("camp", "images/world/IMG_1357.jpg", "Cole on an outdoor adventure", "Camp life", "Hammock camping, open air, and a little distance from the usual routine."),
+        new("camp", ImagePath: "images/world/Acadia.JPG", "Cole on a hike", "Acadia National Park", "Exploring the trails and enjoying the natural beauty of Acadia National Park."),
         new("camp", "images/world/Fourwheeling.JPG", "Cole on an ATV", "Four-wheeling", "Kicking up dirt on the four-wheelers."),
         
-        new("church", "images/world/GraysonConfirmation.jpg", "", "Community and service", "The confirmation into the church of one of my students!"),
+        new("church", "images/world/GraysonConfirmation.jpg", "Cole with one of his students at their confirmation", "Community and service", "The confirmation into the church of one of my students!"),
         new("church", "images/world/Universal.jpg", "Cole with the youth group at Universal Studios", "Youth trip to Universal", "Taking the youth group to Universal for a night of rides and fun."),
         new("church", "images/world/BusDriver.jpg", "Cole driving the youth group bus", "Bus driver duty", "Driving the youth group on a trip; everyone else got a nap."),
-        new("church", "images/world/DirtBikeGrayson.jpg", "Cole with confirman", "Celebration", "Celebrating confirmation with my confirmee Grayson."),
+        new("church", "images/world/DirtBikeGrayson.jpg", "Cole and Grayson in riding gear with a dirt bike and ATV", "Celebration", "Celebrating confirmation with Grayson, one of my confirmands."),
        
         new("golf", "images/world/NolesGame.jpg", "Cole at FSU", "Sports and competition", "A few favorite teams, and enjoying time with family."),
-        new("golf", "images/world/DiskGolf.jpeg", "Cole Disk Golfing", "Freindly competition with friends", "If your not first your last!"),
-        new("golf", "images/world/GatorGame.jpeg", "Cole at brothers bachelor party", "House Divided", "Gator game for my brothers bachelor party."),
+        new("golf", "images/world/DiskGolf.jpeg", "Cole disc golfing", "Friendly competition", "If you're not first, you're last!"),
+        new("golf", "images/world/GatorGame.jpeg", "Cole at his brother's bachelor party", "House Divided", "Gator game for my brother's bachelor party."),
         
         new("brown", "images/world/BrownTeam.jpg", "Cole with his Brown & Brown teammates in matching holiday shirts", "The team", "Matching shirts and all at the Brown & Brown holiday party."),
         new("brown", "images/world/HippieHolidays.JPG", "Cole and teammates at the Hippie Holidays party", "Hippie Holidays", "Groovy and bright with the team at the holiday party."),
@@ -729,13 +729,13 @@
 
     private readonly List<WorldLocation> _locations = new()
     {
-        new("home", "Home", "HOME BASE", "⌂", "Where the projects start", 300, 390),
-        new("work", "Software Engineering", "WORK", "▣", "Building systems that solve real problems", 820, 300),
-        new("ski", "Ski Lodge", "HOBBY AREA", "⛷", "A little farther up the mountain", 1110, 165),
-        new("camp", "Camping", "OUTDOORS", "⛺", "Away from the screen", 1110, 940),
-        new("fishing", "Fishing Dock", "OUTDOORS", "♧", "A quiet place to cast a line", 1280, 1130),
-        new("golf", "Sports", "INTERESTS", "⚾", "A few favorite teams and a moving target", 430, 1110),
-        new("church", "Church", "COMMUNITY", "✚", "A place to serve and gather", 650, 850)
+        new("home", "Home", "HOME BASE", "Where the projects start", 300, 390),
+        new("work", "Software Engineering", "WORK", "Building systems that solve real problems", 820, 300),
+        new("ski", "Ski Lodge", "HOBBY AREA", "A little farther up the mountain", 1110, 165),
+        new("camp", "Camping", "OUTDOORS", "Away from the screen", 1110, 940),
+        new("fishing", "Fishing Dock", "OUTDOORS", "A quiet place to cast a line", 1280, 1130),
+        new("golf", "Sports", "INTERESTS", "A few favorite teams and a moving target", 430, 1110),
+        new("church", "Church", "COMMUNITY", "A place to serve and gather", 650, 850)
     };
 
     private string CameraStyle => $"--player-x:{_playerX}px; --player-y:{_playerY}px";
@@ -1053,7 +1053,7 @@
     private void ClosePanel() { ActiveLocation = null; HomeRoom = null; SelectedVehicle = null; SelectedWorkStation = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; ShowTeamPhotos = false; }
     private void ToggleMinimap() => ShowMinimap = !ShowMinimap;
 
-    private sealed record WorldLocation(string Id, string Name, string Category, string Icon, string Subtitle, int X, int Y);
+    private sealed record WorldLocation(string Id, string Name, string Category, string Subtitle, int X, int Y);
     private sealed record WorkStation(string Id, string ShortName, string Company, string Title, string Description, string Icon, IReadOnlyList<string> Technologies, IReadOnlyList<WorkProject> Projects);
     private sealed record WorkProject(string Id, string Title, string Summary, string Detail, string Technologies);
     private sealed record WorldMemory(string LocationId, string ImagePath, string Alt, string Caption, string Description);

@@ -1,6 +1,6 @@
 @page "/projects"
 
-<PageTitle>Projects — Cole</PageTitle>
+<PageTitle>Projects — Cole Spitzer</PageTitle>
 
 <section class="section">
     <h1>Projects</h1>
@@ -28,12 +28,12 @@
                 I built a batch job that would grab data from an Oracle DB and then ingest it into Excel files daily. This was used as a source of truth while we were migrating to a new system, and it was used by multiple teams to validate their work against the old system.
             </p>
 
-            <button class="read-more" @onclick="ToggleDataMartDetails" aria-expanded="@showDataMartDetails">
-                <span class="read-more-text">@((showDataMartDetails) ? "Show less" : "Read more")</span>
-                <span class="chev @(showDataMartDetails ? "chev-open" : "")" aria-hidden="true">▾</span>
+            <button class="read-more" @onclick='() => Toggle("datamart")' aria-expanded="@Expanded("datamart")">
+                <span class="read-more-text">@(_expanded.Contains("datamart") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
             </button>
 
-            <div class="project-details-wrapper @(showDataMartDetails ? "expanded" : "")">
+            <div class="project-details-wrapper @(_expanded.Contains("datamart") ? "expanded" : "")">
                 <div class="project-details">
                     <div class="detail-step" style="--i:0">
                         <h4>Problem</h4>
@@ -69,12 +69,12 @@
                 Led the modernization of a legacy system into a new portal for FLDCF caseworkers to process assistance applications, migrating old code and databases to a modern framework and design. This became the foundation for the rest of a multi-year, multi-phase project.
             </p>
 
-            <button class="read-more" @onclick="ToggleFLDCFDetails" aria-expanded="@showFLDCFDetails">
-                <span class="read-more-text">@((showFLDCFDetails) ? "Show less" : "Read more")</span>
-                <span class="chev @(showFLDCFDetails ? "chev-open" : "")" aria-hidden="true">▾</span>
+            <button class="read-more" @onclick='() => Toggle("portal")' aria-expanded="@Expanded("portal")">
+                <span class="read-more-text">@(_expanded.Contains("portal") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
             </button>
 
-            <div class="project-details-wrapper @(showFLDCFDetails ? "expanded" : "")">
+            <div class="project-details-wrapper @(_expanded.Contains("portal") ? "expanded" : "")">
                 <div class="project-details">
                     <div class="detail-step" style="--i:0">
                         <h4>Problem</h4>
@@ -105,9 +105,9 @@
         </div>
 
         <div class="project-card">
-            <h3>Monthly E&O Survey</h3>
+            <h3>Monthly E&amp;O Survey</h3>
             <p>
-                Conceptualized and developed a monthly compliance survey sent to over 6,000 teammates to keep the company aligned with legal standards. Built while at Brown & Brown.
+                Conceptualized and developed a monthly compliance survey sent to over 6,000 teammates to keep the company aligned with legal standards. Built while at Brown &amp; Brown.
             </p>
             <div class="tags">
                 <span class="tag">Azure Logic Apps</span>
@@ -115,15 +115,14 @@
                 <span class="tag">.NET</span>
                 <span class="tag">Power BI</span>
                 <span class="tag">Azure Data Factory</span>
-                <span class="tag">Survey Monkey</span>
-
+                <span class="tag">SurveyMonkey</span>
             </div>
         </div>
 
         <div class="project-card">
             <h3>JUA</h3>
             <p>
-                Modernization project at Brown & Brown: a secure file-sharing site where users upload and download large files, with granular security matrices applied down to the individual file and folder level.
+                Modernization project at Brown &amp; Brown: a secure file-sharing site where users upload and download large files, with granular security matrices applied down to the individual file and folder level.
             </p>
             <div class="tags">
                 <span class="tag">Entra ID</span>
@@ -133,7 +132,6 @@
                 <span class="tag">Azure Data Factory</span>
                 <span class="tag">Azure Blobs</span>
                 <span class="tag">MSSQL</span>
-
             </div>
         </div>
 
@@ -143,12 +141,12 @@
                 Built a daily pipeline that ingests Qualys vulnerability data into MSSQL and surfaces it in a Power BI report for management and the security team — helping them prioritize and track server fixes.
             </p>
 
-            <button class="read-more" @onclick="ToggleQualysDetails" aria-expanded="@showQualysReportDetails">
-                <span class="read-more-text">@((showQualysReportDetails) ? "Show less" : "Read more")</span>
-                <span class="chev @(showQualysReportDetails ? "chev-open" : "")" aria-hidden="true">▾</span>
+            <button class="read-more" @onclick='() => Toggle("qualys")' aria-expanded="@Expanded("qualys")">
+                <span class="read-more-text">@(_expanded.Contains("qualys") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
             </button>
 
-            <div class="project-details-wrapper @(showQualysReportDetails ? "expanded" : "")">
+            <div class="project-details-wrapper @(_expanded.Contains("qualys") ? "expanded" : "")">
                 <div class="project-details">
                     <div class="detail-step" style="--i:0">
                         <h4>Problem</h4>
@@ -160,7 +158,7 @@
                     </div>
                     <div class="detail-step" style="--i:2">
                         <h4>Outcome</h4>
-                        <p>Gave management and the security team a daily, prioritized view of server vulnerabilities. Turning a manual review process into something they could act on quickly and create work items against.</p>
+                        <p>Gave management and the security team a daily, prioritized view of server vulnerabilities, turning a manual review process into something they could act on quickly and create work items against.</p>
                     </div>
                 </div>
             </div>
@@ -175,20 +173,12 @@
 </section>
 
 @code {
-    private bool showFLDCFDetails;
-    private bool showDataMartDetails;
-    private bool showQualysReportDetails;
+    private readonly HashSet<string> _expanded = new();
 
-    private void ToggleFLDCFDetails()
+    private void Toggle(string project)
     {
-        showFLDCFDetails = !showFLDCFDetails;
+        if (!_expanded.Remove(project)) _expanded.Add(project);
     }
-    private void ToggleDataMartDetails()
-    {
-        showDataMartDetails = !showDataMartDetails;
-    }
-    private void ToggleQualysDetails()
-    {
-        showQualysReportDetails = !showQualysReportDetails;
-    }
+
+    private string Expanded(string project) => _expanded.Contains(project) ? "true" : "false";
 }

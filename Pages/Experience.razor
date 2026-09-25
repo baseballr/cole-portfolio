@@ -1,13 +1,13 @@
 @page "/experience"
 @inject IJSRuntime JS
 
-<PageTitle>Experience — Cole</PageTitle>
+<PageTitle>Experience — Cole Spitzer</PageTitle>
 
 <section class="section">
     <h1>Cole Spitzer — Summary</h1>
-    <p class="lead"> I'm a software engineer with @yearsOfExperience() years of experience building and supporting production systems for government and insurance clients. My background includes C#, .NET, React, Azure, SQL, and modernizing legacy systems. I enjoy taking on difficult problems, figuring out how to solve them, and seeing projects through from the initial idea to production and long-term support. 
-    </p> 
-    <p class="lead"> I care about writing clean, maintainable code and building applications that solve real problems for the people who use them. I like understanding the bigger picture, working with the people involved, and taking ownership of the work I'm responsible for. I'm always looking to improve, whether that's learning a new framework, getting better at architecture, or taking on more responsibility within a team. I enjoy working with new technology, but I also appreciate using tools and approaches that are proven to work. 
+    <p class="lead">I'm a software engineer with @YearsOfExperience() years of experience building and supporting production systems for government and insurance clients. My background includes C#, .NET, React, Azure, SQL, and modernizing legacy systems. I enjoy taking on difficult problems, figuring out how to solve them, and seeing projects through from the initial idea to production and long-term support.
+    </p>
+    <p class="lead">I care about writing clean, maintainable code and building applications that solve real problems for the people who use them. I like understanding the bigger picture, working with the people involved, and taking ownership of the work I'm responsible for. I'm always looking to improve, whether that's learning a new framework, getting better at architecture, or taking on more responsibility within a team. I enjoy working with new technology, but I also appreciate using tools and approaches that are proven to work.
     </p>
 </section>
 
@@ -35,7 +35,7 @@
                 </p>
                 <ul>
                     <li>Lead a 5-developer team delivering UI features and integrations for a 200-person modernization program.</li>
-                    <li>Developed 200+ C# APIs with sub 5 second responses using reusable async patterns to avoid duplicate work.</li>
+                    <li>Developed 200+ C# APIs with sub-5-second responses using reusable async patterns to avoid duplicate work.</li>
                     <li>Built a data comparison ("wizards") tool that aggregates four government sources to help caseworkers process cases.</li>
                     <li>Designed workaround solutions for legacy databases to keep delivery on track when direct requests were infeasible.</li>
                     <li>Implemented a C# batch job that ingests and aggregates 103M+ rows and writes SFTP output under 8 minutes.</li>
@@ -47,7 +47,7 @@
             <div class="timeline-marker"></div>
             <div class="timeline-content">
                 <h3>Software Engineer</h3>
-                <p class="timeline-meta">Brown &amp; Brown Insurance &middot; Hybrid (Daytona Beach, FL) &middot; Oct 2021 — April 2024</p>
+                <p class="timeline-meta">Brown &amp; Brown Insurance &middot; Hybrid (Daytona Beach, FL) &middot; October 2021 — April 2024</p>
                 <p>
                     Worked on new features and modernization efforts across insurance systems, focusing on secure integrations,
                     automation, and internal tooling that reduced manual effort and improved operational visibility.
@@ -68,15 +68,15 @@
     <h2>Skills</h2>
     <div class="skills-grid">
         <div class="skill-card">
-            <h4>Languages & Frameworks</h4>
+            <h3>Languages &amp; Frameworks</h3>
             <p>C#, .NET, Blazor, React, JavaScript, Python, Java, SQL</p>
         </div>
         <div class="skill-card">
-            <h4>Cloud & Tools</h4>
+            <h3>Cloud &amp; Tools</h3>
             <p>Azure Functions, Azure Web Apps, API Management, Azure Blobs, MSSQL, Oracle, Power BI, Docker, Git</p>
         </div>
         <div class="skill-card">
-            <h4>Other</h4>
+            <h3>Other</h3>
             <p>Entra ID, Swagger/OpenAPI, RESTful APIs, Power Platform, Visual Studio, VS Code, SurveyJS</p>
         </div>
     </div>
@@ -84,22 +84,19 @@
 
 <section class="section">
     <h2>Community</h2>
-    <p>Assistant Youth Director &middot; September 2021 - Current</p>
-    <p>Board of Trustees member at First Church Deland &middot; January 2023 - Current</p>
-    <p>South Eastern Guide Dogs puppy trainer &middot; December 2018 - January 2020</p>
+    <ul class="simple-list">
+        <li><strong>Assistant Youth Director</strong> &middot; September 2021 — Present</li>
+        <li><strong>Board of Trustees member</strong>, First Church DeLand &middot; January 2023 — Present</li>
+        <li><strong>Puppy trainer</strong>, Southeastern Guide Dogs &middot; December 2018 — January 2020</li>
+    </ul>
 </section>
-@code {
-    private int yearsOfExperience()
-    {
-        DateTime startDate = new DateTime(2021, 10, 1);
-        DateTime today = DateTime.Now;
 
-        int _yearsOfExperience = today.Year - startDate.Year;
-        if (today.Month < startDate.Month)
-        {
-            _yearsOfExperience--;
-        }
-        return _yearsOfExperience;
+@code {
+    // First software engineering role started October 2021.
+    private static int YearsOfExperience()
+    {
+        var today = DateTime.Today;
+        return today.Year - 2021 - (today.Month < 10 ? 1 : 0);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -109,5 +106,4 @@
             await JS.InvokeVoidAsync("scrollRevealInterop.init");
         }
     }
-
 }

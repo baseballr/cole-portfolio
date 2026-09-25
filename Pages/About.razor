@@ -1,9 +1,9 @@
 @page "/about"
 
-<PageTitle>Cole — Software Engineer</PageTitle>
+<PageTitle>Cole Spitzer — Software Engineer</PageTitle>
 
 <section class="hero">
-    <HeroCarousel Images="_heroImages" IntervalMs="5000" />
+    <HeroCarousel Images="_heroImages" />
     <div class="hero-content">
         <p class="eyebrow">Hi, I'm</p>
         <h1>Cole</h1>
@@ -23,7 +23,6 @@
         I can be a little stubborn... or, depending on how you look at it, persistent. When something catches my interest or I’m faced with a problem I want to solve, I tend to dedicate myself to figuring it out. I don't like giving up simply because something is difficult or unfamiliar. I enjoy learning along the way, trying different approaches, and continuing until I have a better understanding of the problem.
     </p>
     <p>
-
         Outside of work, I enjoy being outdoors and spending time exploring new places and activities. I value opportunities to challenge myself, learn new skills, and take on projects that push me outside of what I already know.
         At the end of the day, I’m someone who is naturally curious, driven to understand how things work, and willing to put in the effort to figure things out. Those qualities are a big part of who I am—not only personally, but also in the way I approach my work and the challenges I take on.
     </p>
@@ -42,17 +41,16 @@
         </div>
         <div class="skill-card">
             <h3>Cloud &amp; DevOps</h3>
-            <p>Microsoft Azure, CI/CD pipelines, Git, Azure Dev Ops, Data Factory</p>
+            <p>Microsoft Azure, CI/CD pipelines, Git, Azure DevOps, Data Factory</p>
         </div>
         <div class="skill-card">
             <h3>Practices</h3>
-            <p>Enterprise application design, agile development, code reviewing, team leading, MVC </p>
+            <p>Enterprise application design, agile development, code reviews, team leadership, MVC</p>
         </div>
     </div>
 </section>
 
 @code {
-    // Drop your own photos in wwwroot/images/carousel/ and list them here, in order.
     private List<string> _heroImages = new()
     {
         "images/carousel/Cole3.jpg",
@@ -64,13 +62,10 @@
         "images/carousel/cole4.jpg",
     };
 
-    private int CurrentAge()
+    // Born January 3, 2000.
+    private static int CurrentAge()
     {
-        if (DateTime.Now.Month > 1 || (DateTime.Now.Month == 1 && DateTime.Now.Day >= 3))
-        {
-            return DateTime.Now.Year - 2000;
-        }
-        return DateTime.Now.Year - 2000 - 1;
-        
+        var today = DateTime.Today;
+        return today.Year - 2000 - (today < new DateTime(today.Year, 1, 3) ? 1 : 0);
     }
 }

@@ -6,10 +6,10 @@ static site to GitHub Pages via GitHub Actions.
 ## Pages
 - **Cole's World** (`/colesworld`) — interactive top-down portfolio world with driveable locations
 - **About** (`/about`) — bio and core skills
-- **Experience** (`/experience`) — Related Work Experience
-- **Employment History** (`/employmenthistory`) — All prior worked jobs
+- **Experience** (`/experience`) — summary, education, and related work experience
+- **Employment History** (`/employmenthistory`) — full job timeline
 - **Projects** (`/projects`) — project cards
-- **Contact** (`/contact`) — placeholder email/LinkedIn/resume
+- **Contact** (`/contact`) — email, LinkedIn, and resume download
 
 ## Cole's World
 
