@@ -1,6 +1,6 @@
 @page "/projects"
 
-<PageTitle>Projects — Cole</PageTitle>
+<PageTitle>Projects — Cole Spitzer</PageTitle>
 
 <section class="section">
     <h1>Projects</h1>
@@ -9,6 +9,53 @@
     </p>
 
     <div class="projects-grid">
+        <div class="project-card">
+            <h3>This Portfolio</h3>
+            <p>
+                The site you're on: a Blazor WebAssembly app with Cole's World, a drivable map of my work and life drawn entirely in CSS and SVG. It's the one project I can share the code for.
+            </p>
+
+            <button class="read-more" @onclick='() => Toggle("portfolio")' aria-expanded="@Expanded("portfolio")">
+                <span class="read-more-text">@(_expanded.Contains("portfolio") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="project-details-wrapper @(_expanded.Contains("portfolio") ? "expanded" : "")">
+                <div class="project-details">
+                    <div class="detail-step" style="--i:0">
+                        <h4>Problem</h4>
+                        <p>All of my professional work is internal client software I can't show, so I wanted a portfolio that demonstrates how I build things instead of just listing them, and that stands out from template sites.</p>
+                    </div>
+                    <div class="detail-step" style="--i:1">
+                        <h4>Approach</h4>
+                        <p>Built it in C# with Blazor WebAssembly on .NET 8, deployed as a static site to GitHub Pages through a GitHub Actions pipeline on every push. Cole's World is plain CSS and inline SVG with no game engine: seasonal decorations follow the visitor's date (including a calculated Easter), lighting follows their clock, and it drives with the keyboard on desktop or by dragging on phones.</p>
+                    </div>
+                    <div class="detail-step" style="--i:2">
+                        <h4>Tradeoff</h4>
+                        <p>Blazor has a slower first load than a plain JavaScript site, but it let me build the whole thing in the same C# I use every day. Static hosting is free and needs no server, at the cost of a small redirect workaround so deep links like /projects work on GitHub Pages.</p>
+                    </div>
+                    <div class="detail-step" style="--i:3">
+                        <h4>Outcome</h4>
+                        <p>A live site on a custom domain that deploys itself on every push, works on phones and desktops, and gives people something to remember me by.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-links">
+                <a href="/colesworld" class="link">Explore Cole's World →</a>
+                <a href="https://github.com/baseballr/cole-portfolio" target="_blank" rel="noopener noreferrer" class="link">View source →</a>
+            </div>
+
+            <div class="tags">
+                <span class="tag">C#</span>
+                <span class="tag">.NET</span>
+                <span class="tag">Blazor</span>
+                <span class="tag">CSS</span>
+                <span class="tag">SVG</span>
+                <span class="tag">GitHub Actions</span>
+            </div>
+        </div>
+
         <div class="project-card">
             <h3>FLDCF Wizards</h3>
             <p>
@@ -25,15 +72,15 @@
         <div class="project-card">
             <h3>Datamart</h3>
             <p>
-                I built a batch job that would grab data from an Oracle DB and then ingest it into Excel files daily. This was used as a source of truth while we were migrating to a new system, and it was used by multiple teams to validate their work against the old system.
+                I built a batch job that would grab data from an Oracle DB, write it into Excel files, and deliver them over SFTP daily. This was used as a source of truth while we were migrating to a new system, and it was used by multiple teams to validate their work against the old system.
             </p>
 
-            <button class="read-more" @onclick="ToggleDataMartDetails" aria-expanded="@showDataMartDetails">
-                <span class="read-more-text">@((showDataMartDetails) ? "Show less" : "Read more")</span>
-                <span class="chev @(showDataMartDetails ? "chev-open" : "")" aria-hidden="true">▾</span>
+            <button class="read-more" @onclick='() => Toggle("datamart")' aria-expanded="@Expanded("datamart")">
+                <span class="read-more-text">@(_expanded.Contains("datamart") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
             </button>
 
-            <div class="project-details-wrapper @(showDataMartDetails ? "expanded" : "")">
+            <div class="project-details-wrapper @(_expanded.Contains("datamart") ? "expanded" : "")">
                 <div class="project-details">
                     <div class="detail-step" style="--i:0">
                         <h4>Problem</h4>
@@ -49,7 +96,7 @@
                     </div>
                     <div class="detail-step" style="--i:3">
                         <h4>Outcome</h4>
-                        <p>A daily pipeline that ingests and aggregates 108M+ rows and writes complete SFTP output in under 8 minutes, giving FLDCF a transparent, self-service way to validate the data instead of relying on trust in the pipeline.</p>
+                        <p>A daily pipeline that ingests and aggregates 108M+ rows, writes the Excel workbooks, and delivers them over SFTP in under 8 minutes, giving FLDCF a transparent, self-service way to validate the data instead of relying on trust in the pipeline.</p>
                     </div>
                 </div>
             </div>
@@ -69,12 +116,12 @@
                 Led the modernization of a legacy system into a new portal for FLDCF caseworkers to process assistance applications, migrating old code and databases to a modern framework and design. This became the foundation for the rest of a multi-year, multi-phase project.
             </p>
 
-            <button class="read-more" @onclick="ToggleFLDCFDetails" aria-expanded="@showFLDCFDetails">
-                <span class="read-more-text">@((showFLDCFDetails) ? "Show less" : "Read more")</span>
-                <span class="chev @(showFLDCFDetails ? "chev-open" : "")" aria-hidden="true">▾</span>
+            <button class="read-more" @onclick='() => Toggle("portal")' aria-expanded="@Expanded("portal")">
+                <span class="read-more-text">@(_expanded.Contains("portal") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
             </button>
 
-            <div class="project-details-wrapper @(showFLDCFDetails ? "expanded" : "")">
+            <div class="project-details-wrapper @(_expanded.Contains("portal") ? "expanded" : "")">
                 <div class="project-details">
                     <div class="detail-step" style="--i:0">
                         <h4>Problem</h4>
@@ -105,25 +152,25 @@
         </div>
 
         <div class="project-card">
-            <h3>Monthly E&O Survey</h3>
+            <h3>Monthly E&amp;O Survey</h3>
             <p>
-                Conceptualized and developed a monthly compliance survey sent to over 6,000 teammates to keep the company aligned with legal standards. Built while at Brown & Brown.
+                Conceptualized and developed a monthly compliance survey sent to over 6,000 teammates to keep the company aligned with legal standards. Built while at Brown &amp; Brown.
             </p>
             <div class="tags">
+                <span class="tag">Azure Functions</span>
                 <span class="tag">Azure Logic Apps</span>
                 <span class="tag">C#</span>
                 <span class="tag">.NET</span>
                 <span class="tag">Power BI</span>
                 <span class="tag">Azure Data Factory</span>
-                <span class="tag">Survey Monkey</span>
-
+                <span class="tag">SurveyJS</span>
             </div>
         </div>
 
         <div class="project-card">
             <h3>JUA</h3>
             <p>
-                Modernization project at Brown & Brown: a secure file-sharing site where users upload and download large files, with granular security matrices applied down to the individual file and folder level.
+                Modernization project at Brown &amp; Brown: a secure file-sharing site where users upload and download large files, with granular security matrices applied down to the individual file and folder level.
             </p>
             <div class="tags">
                 <span class="tag">Entra ID</span>
@@ -133,7 +180,6 @@
                 <span class="tag">Azure Data Factory</span>
                 <span class="tag">Azure Blobs</span>
                 <span class="tag">MSSQL</span>
-
             </div>
         </div>
 
@@ -143,12 +189,12 @@
                 Built a daily pipeline that ingests Qualys vulnerability data into MSSQL and surfaces it in a Power BI report for management and the security team — helping them prioritize and track server fixes.
             </p>
 
-            <button class="read-more" @onclick="ToggleQualysDetails" aria-expanded="@showQualysReportDetails">
-                <span class="read-more-text">@((showQualysReportDetails) ? "Show less" : "Read more")</span>
-                <span class="chev @(showQualysReportDetails ? "chev-open" : "")" aria-hidden="true">▾</span>
+            <button class="read-more" @onclick='() => Toggle("qualys")' aria-expanded="@Expanded("qualys")">
+                <span class="read-more-text">@(_expanded.Contains("qualys") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
             </button>
 
-            <div class="project-details-wrapper @(showQualysReportDetails ? "expanded" : "")">
+            <div class="project-details-wrapper @(_expanded.Contains("qualys") ? "expanded" : "")">
                 <div class="project-details">
                     <div class="detail-step" style="--i:0">
                         <h4>Problem</h4>
@@ -160,7 +206,7 @@
                     </div>
                     <div class="detail-step" style="--i:2">
                         <h4>Outcome</h4>
-                        <p>Gave management and the security team a daily, prioritized view of server vulnerabilities. Turning a manual review process into something they could act on quickly and create work items against.</p>
+                        <p>Gave management and the security team a daily, prioritized view of server vulnerabilities, turning a manual review process into something they could act on quickly and create work items against.</p>
                     </div>
                 </div>
             </div>
@@ -175,20 +221,12 @@
 </section>
 
 @code {
-    private bool showFLDCFDetails;
-    private bool showDataMartDetails;
-    private bool showQualysReportDetails;
+    private readonly HashSet<string> _expanded = new();
 
-    private void ToggleFLDCFDetails()
+    private void Toggle(string project)
     {
-        showFLDCFDetails = !showFLDCFDetails;
+        if (!_expanded.Remove(project)) _expanded.Add(project);
     }
-    private void ToggleDataMartDetails()
-    {
-        showDataMartDetails = !showDataMartDetails;
-    }
-    private void ToggleQualysDetails()
-    {
-        showQualysReportDetails = !showQualysReportDetails;
-    }
+
+    private string Expanded(string project) => _expanded.Contains(project) ? "true" : "false";
 }

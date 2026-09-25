@@ -2,13 +2,13 @@
 @inject IJSRuntime JS
 
 <div class="page">
-    <header class="site-header @( _menuOpen ? "menu-open" : string.Empty)">
+    <header class="site-header">
         <div class="header-inner">
-            <button class="menu-toggle" @onclick="ToggleMenu" aria-expanded="@_menuOpen" aria-label="Toggle navigation">&#9776;</button>
+            <button class="menu-toggle" @onclick="ToggleMenu" aria-expanded="@(_menuOpen ? "true" : "false")" aria-label="Toggle navigation">&#9776;</button>
             <a href="/" class="brand">Cole Spitzer<span class="accent">.</span></a>
             <nav class="site-nav @(_menuOpen ? "open" : string.Empty)">
                 <a href="/about" @onclick="CloseMenu">About</a>
-                <a href="/colesworld" @onclick="CloseMenu">Coles World</a>
+                <a href="/colesworld" @onclick="CloseMenu">Cole's World</a>
                 <a href="/experience" @onclick="CloseMenu">Experience</a>
                 <a href="/projects" @onclick="CloseMenu">Projects</a>
                 <a href="/employmenthistory" @onclick="CloseMenu">Employment</a>
@@ -33,18 +33,11 @@
 </div>
 
 @code {
-    private bool _menuOpen = false;
+    private bool _menuOpen;
     private bool _isDark = true;
 
-    private void ToggleMenu()
-    {
-        _menuOpen = !_menuOpen;
-    }
-
-    private void CloseMenu()
-    {
-        _menuOpen = false;
-    }
+    private void ToggleMenu() => _menuOpen = !_menuOpen;
+    private void CloseMenu() => _menuOpen = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
