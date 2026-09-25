@@ -276,6 +276,10 @@ html, body {
         margin: 0 0 1rem;
     }
 
+.section p a {
+    color: var(--accent);
+}
+
 .section-intro {
     color: var(--text-muted);
     margin-bottom: 2rem;
