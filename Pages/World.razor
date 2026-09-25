@@ -1,0 +1,1060 @@
+@page "/colesworld"
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Cole's World</PageTitle>
+
+<section @ref="_screen" class="world-screen world-@_timeOfDay season-@_season weather-@_weather" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
+    <div class="world-hud">
+        <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span>@if (_secrets.Count > 0) { <span class="secret-count" title="Secrets found">★ @_secrets.Count/@SecretNames.Count</span> }</div>
+        <button class="vehicle-switch" @onclick="SwitchVehicle" title="Switch vehicle (V)"><span>@Vehicle.Icon</span> @Vehicle.Name <b>⇄</b></button>
+    </div>
+
+    <div class="world-viewport" aria-label="Cole's World. Drive with WASD or arrow keys and press E near a location.">
+        <div class="world-canvas" style="@CameraStyle">
+            <div class="world-sky"></div>
+            <div class="world-road world-road-main"></div>
+            <div class="world-road road-home"></div>
+            <div class="world-road road-work"></div>
+            <div class="world-road road-ski"></div>
+            <div class="world-road road-church"></div>
+            <div class="world-road road-golf"></div>
+            <div class="world-road road-fishing"></div>
+            <div class="world-road road-camp"></div>
+            @foreach (var connection in _roadConnections)
+            {
+                <span class="world-road-connection @(connection.Y < 700 ? "connection-up" : "connection-down")" style="left:@($"{connection.X}px"); top:@($"{connection.Y}px")"></span>
+            }
+            <div class="world-bridge" aria-hidden="true"></div>
+            <svg class="world-river" viewBox="0 0 1500 1500" aria-hidden="true"><path d="@RiverPath" /><path class="river-flow" d="@RiverPath" /></svg>
+            <div class="world-water water-one"><i class="pond-fish"></i><i class="pond-fish pond-fish-two"></i></div>
+            <div class="world-mountain mountain-one"></div>
+            <div class="world-mountain mountain-two"></div>
+            <div class="world-yeti-spot" aria-hidden="true"><span class="world-yeti" @onclick='() => FindSecret("yeti")'></span></div>
+            <div class="world-bear-spot" aria-hidden="true"><span class="world-bear" @onclick='() => FindSecret("bear")'></span></div>
+            <i class="river-fish" aria-hidden="true"></i>
+            <div class="critter critter-dog @(DogExcited ? "critter-dog-excited" : string.Empty)" @onclick="PetDog" style="left:@($"{_dog.X}px"); top:@($"{_dog.Y}px")" aria-hidden="true">
+                <svg viewBox="0 0 60 50">
+                    <ellipse cx="32" cy="47" rx="22" ry="3" fill="rgba(30, 86, 71, 0.3)" />
+                    <path class="dog-tail" d="M44 40 Q54 38 56 28" fill="none" stroke="#d9a456" stroke-width="5" stroke-linecap="round" />
+                    <ellipse cx="39" cy="37" rx="12" ry="11" fill="#e3b56c" />
+                    <ellipse cx="42" cy="46" rx="7" ry="2.8" fill="#d9a456" />
+                    <ellipse cx="27" cy="31" rx="9" ry="13" fill="#e3b56c" />
+                    <ellipse cx="24" cy="33" rx="5" ry="8" fill="#f3d59a" />
+                    <rect x="27" y="36" width="5" height="11" rx="2.5" fill="#d9a456" />
+                    <rect x="20" y="36" width="5" height="11" rx="2.5" fill="#e8bd74" />
+                    <path d="M20 25 q7 4 13 0" fill="none" stroke="#d35f46" stroke-width="3" stroke-linecap="round" />
+                    <circle cx="26" cy="29" r="1.6" fill="#f5d58f" />
+                    <circle cx="25" cy="17" r="9" fill="#e8bd74" />
+                    <ellipse class="dog-tongue" cx="17" cy="24" rx="2" ry="2.6" fill="#e56b6f" />
+                    <ellipse cx="17.5" cy="20" rx="6.5" ry="4.5" fill="#f3d59a" />
+                    <circle cx="12" cy="19" r="2" fill="#2a1d15" />
+                    <circle cx="21.5" cy="15" r="1.4" fill="#2a1d15" />
+                    <path d="M28 10 q7 1 5 12 q-4 1 -6 -4 z" fill="#c98f45" />
+                </svg>
+                <span class="dog-heart">♥</span>
+                @if (_honking) { <span class="speech">Woof!</span> }
+            </div>
+            <div class="critter critter-fishers" style="left:@($"{_fishers.X}px"); top:@($"{_fishers.Y}px")" aria-hidden="true">
+                <svg viewBox="0 0 120 80">
+                    @if (FamilyActivity == "skating")
+                    {
+                        <path d="M70 72 q20 -5 45 1 M76 76 q18 -3 36 0" stroke="rgba(255, 255, 255, 0.8)" stroke-width="0.8" fill="none" />
+                        <g class="skaters">
+                            <ellipse cx="95" cy="74" rx="20" ry="2.5" fill="rgba(30, 86, 71, 0.25)" />
+                            <path d="M82 53 L79 72 M88 53 L92 72" stroke="#4a6f96" stroke-width="5" stroke-linecap="round" />
+                            <path d="M75 73.5 h8 M88 73.5 h8" stroke="#cfd8dc" stroke-width="1.4" stroke-linecap="round" />
+                            <rect x="77" y="33" width="16" height="22" rx="5" fill="#3a4f55" />
+                            <path d="M80 38 L72 45" stroke="#3a4f55" stroke-width="4.5" stroke-linecap="round" /><circle cx="71" cy="46" r="2.2" fill="#eab48c" />
+                            <path d="M90 38 L99 47" stroke="#3a4f55" stroke-width="4.5" stroke-linecap="round" />
+                            <circle cx="85" cy="27" r="6.5" fill="#eab48c" /><ellipse cx="87.5" cy="31" rx="4.5" ry="4" fill="#9a6440" />
+                            <path d="M78.5 26 a6.5 6.5 0 0 1 13 0 z" fill="#5aa0c8" /><circle cx="85" cy="19.5" r="2" fill="#fff" />
+                            <rect x="78" y="33" width="14" height="3.5" rx="1.5" fill="#d35f46" /><rect x="88" y="34" width="3" height="9" fill="#d35f46" />
+                            <path d="M102 62 L101 72 M106 62 L109 72" stroke="#4a6f96" stroke-width="4" stroke-linecap="round" />
+                            <path d="M98 73.5 h6 M106 73.5 h6" stroke="#cfd8dc" stroke-width="1.2" stroke-linecap="round" />
+                            <rect x="98" y="46" width="11.5" height="16" rx="4" fill="#f5c976" />
+                            <path d="M100 50 L99.5 47" stroke="#f5c976" stroke-width="3.5" stroke-linecap="round" /><circle cx="99.5" cy="47" r="1.8" fill="#eab48c" />
+                            <path d="M108 50 L114 55" stroke="#f5c976" stroke-width="3.5" stroke-linecap="round" /><circle cx="114.5" cy="55.5" r="1.8" fill="#eab48c" />
+                            <circle cx="104" cy="41" r="5.2" fill="#eab48c" /><path d="M98.8 40 a5.2 5.2 0 0 1 10.4 0 z" fill="#d35f46" /><circle cx="104" cy="34.5" r="1.6" fill="#fff" />
+                            <circle cx="106.6" cy="41.5" r="0.8" fill="#2a1d15" />
+                        </g>
+                    }
+                    else
+                    {
+                    <ellipse cx="34" cy="74" rx="26" ry="3.5" fill="rgba(30, 86, 71, 0.3)" />
+                    <rect x="15" y="52" width="5.5" height="21" rx="2" fill="#4a6f96" /><rect x="22" y="52" width="5.5" height="21" rx="2" fill="#4a6f96" />
+                    <rect x="13" y="33" width="16" height="22" rx="5" fill="#3a4f55" />
+                    <circle cx="21" cy="27" r="6.5" fill="#eab48c" />
+                    <ellipse cx="23.5" cy="31" rx="4.5" ry="4" fill="#9a6440" />
+                    <rect x="22" y="24" width="5" height="2.2" rx="1" fill="#d35f46" />
+                    <rect x="15.5" y="15" width="11" height="7.5" rx="3" fill="#e8d5a8" /><ellipse cx="21" cy="22.5" rx="11" ry="2.3" fill="#d9c28e" />
+                    <path d="M24 38 L33 45" stroke="#3a4f55" stroke-width="4.5" stroke-linecap="round" /><circle cx="34" cy="46" r="2.2" fill="#eab48c" />
+                    <rect x="41" y="62" width="4" height="11" rx="1.5" fill="#eab48c" /><rect x="46.5" y="62" width="4" height="11" rx="1.5" fill="#eab48c" />
+                    <rect x="40" y="58" width="11.5" height="6" rx="2" fill="#4a6f96" />
+                    <rect x="40" y="46" width="11.5" height="14" rx="4" fill="#f5c976" />
+                    <circle cx="46" cy="41" r="5.2" fill="#eab48c" />
+                    <path d="M40.8 40 a5.2 5.2 0 0 1 10.4 0 z" fill="#d35f46" /><rect x="49" y="38.6" width="5" height="1.6" rx="0.8" fill="#b94c38" />
+                    <circle cx="48.6" cy="41.5" r="0.8" fill="#2a1d15" />
+                    <path d="M47 50 L52 56" stroke="#f5c976" stroke-width="3.5" stroke-linecap="round" /><circle cx="52.5" cy="57" r="1.8" fill="#eab48c" />
+                    }
+                    @switch (FamilyActivity)
+                    {
+                        case "eggs":
+                            <path d="M49 59 q4.5 -8 9 0" stroke="#9a6440" stroke-width="1.2" fill="none" />
+                            <ellipse cx="51" cy="58.5" rx="1.6" ry="2" fill="#f7a8c4" /><ellipse cx="55" cy="58.5" rx="1.6" ry="2" fill="#5aa0c8" />
+                            <path d="M48 59 h11 l-1.5 7 h-8 z" fill="#c98f45" /><path d="M48.5 62 h10" stroke="#9a6440" stroke-width="0.8" />
+                            <g class="hunt-egg"><ellipse cx="-6" cy="70" rx="2.6" ry="3.4" fill="#f5c976" /><path d="M-8.5 70 h5" stroke="#fff" stroke-width="0.9" /></g>
+                            <g class="hunt-egg hunt-egg-two"><ellipse cx="5" cy="76" rx="2.6" ry="3.4" fill="#b99be0" /><path d="M2.5 76 h5" stroke="#fff" stroke-width="0.9" /></g>
+                            <path d="M-12 73 q3 -7 6 0 q3 -6 5 0" fill="#5d9a4a" />
+                            break;
+                        case "dinner":
+                            <ellipse cx="36" cy="45.5" rx="5.5" ry="2" fill="#e3b56c" /><ellipse cx="36" cy="44.8" rx="4" ry="1.2" fill="#c65b43" />
+                            <ellipse cx="54.5" cy="56.5" rx="4" ry="1.2" fill="#fff" stroke="#cfd8dc" stroke-width="0.5" />
+                            @* Table sits up the bank (shifted left) so it stays clear of the pond's edge. *@
+                            <g transform="translate(-28 0)">
+                            <g class="dinner-steam" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1" fill="none"><path d="M26 48 q-2 -3 0 -6 t0 -6" /><path d="M31 47 q-2 -3 0 -6 t0 -6" /></g>
+                            <rect x="4" y="63" width="2.5" height="11" fill="#7c6545" /><rect x="57" y="63" width="2.5" height="11" fill="#7c6545" />
+                            <path d="M-2 58 h66 v8 h-66 z" fill="#fff8e6" /><path d="M-2 58 h66 v2 h-66 z" fill="#f0e2bd" /><rect x="22" y="58" width="18" height="8" fill="#e88a3a" />
+                            <ellipse cx="10" cy="57.5" rx="4" ry="1.2" fill="#fff" stroke="#cfd8dc" stroke-width="0.5" />
+                            <ellipse cx="28.5" cy="55" rx="7" ry="4.5" fill="#b8733f" /><ellipse cx="27" cy="53.5" rx="3.5" ry="1.8" fill="#d99a5c" />
+                            <path d="M22 56 l-3 -3 M35 56 l3 -3" stroke="#b8733f" stroke-width="2.2" stroke-linecap="round" /><circle cx="18.6" cy="52.6" r="1.1" fill="#fff" /><circle cx="38.4" cy="52.6" r="1.1" fill="#fff" />
+                            <ellipse cx="46" cy="57" rx="4" ry="2.5" fill="#e88a3a" /><rect x="45.5" y="53.5" width="1.2" height="2" fill="#5d7a3a" />
+                            </g>
+                            break;
+                        case "pumpkin":
+                            <line x1="34" y1="46" x2="37" y2="54" stroke="#b3bbb2" stroke-width="1.2" stroke-linecap="round" />
+                            <ellipse cx="42" cy="68" rx="12" ry="8" fill="#e88a3a" /><ellipse cx="42" cy="68" rx="6" ry="8" fill="#f59b54" /><ellipse cx="42" cy="68" rx="2" ry="8" fill="#e88a3a" />
+                            <rect x="40.5" y="57.5" width="3" height="4" rx="1" fill="#5d7a3a" />
+                            <g class="pumpkin-face carve-glow"><polygon points="35,66 39,66 37,63" /><polygon points="45,66 49,66 47,63" /><path d="M35 70 Q42 76 49 70 L46.5 71.5 L45 70.5 L42 72 L39 70.5 L37.5 71.5 Z" /></g>
+                            <path d="M58 74 q2 -3 4 0 q2 -3 4 0" fill="#e88a3a" />
+                            break;
+                        case "fishing":
+                    <g class="angler angler-dad">
+                        <ellipse class="splash" cx="86" cy="63" rx="5" ry="1.8" fill="none" stroke="#fff" stroke-width="1.2" />
+                        <g class="rod">
+                            <line x1="34" y1="46" x2="84" y2="12" stroke="#5a3a24" stroke-width="1.8" stroke-linecap="round" />
+                            <line x1="84" y1="12" x2="86" y2="62" stroke="rgba(255, 255, 255, 0.75)" stroke-width="0.7" />
+                            <g class="bobber"><circle cx="86" cy="62" r="2.3" fill="#fff" /><path d="M83.7 62 a2.3 2.3 0 0 1 4.6 0 z" fill="#d35f46" /></g>
+                            <g class="catch"><ellipse cx="86" cy="67" rx="2.8" ry="5.5" fill="#f59b54" /><path d="M86 71.5 l-3.5 4 h7 z" fill="#e36d3d" /><circle cx="85" cy="64.5" r="0.7" fill="#2a1d15" /></g>
+                        </g>
+                    </g>
+                    <g class="angler angler-boy">
+                        <ellipse class="splash" cx="102" cy="69" rx="5" ry="1.8" fill="none" stroke="#fff" stroke-width="1.2" />
+                        <g class="rod">
+                            <line x1="52" y1="57" x2="100" y2="32" stroke="#5a3a24" stroke-width="1.5" stroke-linecap="round" />
+                            <line x1="100" y1="32" x2="102" y2="68" stroke="rgba(255, 255, 255, 0.75)" stroke-width="0.7" />
+                            <g class="bobber"><circle cx="102" cy="68" r="2.3" fill="#fff" /><path d="M99.7 68 a2.3 2.3 0 0 1 4.6 0 z" fill="#d35f46" /></g>
+                            <g class="catch"><ellipse cx="102" cy="73" rx="2.8" ry="5.5" fill="#f59b54" /><path d="M102 77.5 l-3.5 4 h7 z" fill="#e36d3d" /><circle cx="101" cy="70.5" r="0.7" fill="#2a1d15" /></g>
+                        </g>
+                    </g>
+                            break;
+                    }
+                </svg>
+                @if (_honking)
+                {
+                    <span class="speech speech-fishers">@(FamilyActivity switch { "skating" => "Whoa! Don't crack the ice!", "eggs" => "Shh! You'll scare the bunny!", "dinner" => "Dinner's almost ready!", "pumpkin" => "Boo!", _ => "Shh! The fish!" })</span>
+                }
+            </div>
+            <div class="cloud-shadow cloud-1"></div><div class="cloud-shadow cloud-2"></div><div class="cloud-shadow cloud-3"></div>
+
+            <div class="mailbox @(NearMailbox ? "mailbox-near" : string.Empty)" style="left:@($"{_mailbox.X}px"); top:@($"{_mailbox.Y}px")" @onclick="OpenMailbox" title="Contact Cole">
+                <span class="mailbox-sign">CONTACT</span>
+                <svg viewBox="0 0 34 44">
+                    <ellipse cx="17" cy="42.5" rx="12" ry="2" fill="rgba(30, 86, 71, 0.3)" />
+                    <rect x="14.5" y="20" width="5" height="23" fill="#7c6545" />
+                    <path d="M3 22 V13 a9 9 0 0 1 9 -9 h10 a9 9 0 0 1 9 9 v9 z" fill="#c65b43" />
+                    <path d="M3 22 V13 a9 9 0 0 1 9 -9 v18 z" fill="#a8483a" />
+                    <rect x="0" y="11" width="11" height="7" fill="#fff8e6" transform="rotate(-18 5 14)" />
+                    <g class="mailbox-flag"><rect x="29" y="2" width="2.5" height="14" fill="#f6d18a" /><rect x="29" y="2" width="9" height="5" fill="#e56b6f" /></g>
+                </svg>
+            </div>
+
+            <div class="decor decor-flags" style="left:212px; top:490px" aria-hidden="true">
+                <svg viewBox="0 0 90 80" width="90" height="80">
+                    <defs>
+                        <clipPath id="flag-wave"><path d="M40 0 C30 -2 20 3 10 1 C6 0 3 1 0 2 L0 26 C3 25 6 24 10 25 C20 27 30 22 40 24 Z"><animate attributeName="d" values="M40 0 C30 -2 20 3 10 1 C6 0 3 1 0 2 L0 26 C3 25 6 24 10 25 C20 27 30 22 40 24 Z;M40 0 C30 3 20 -2 10 2 C6 3 3 2 0 1 L0 25 C3 26 6 27 10 26 C20 22 30 27 40 24 Z;M40 0 C30 -2 20 3 10 1 C6 0 3 1 0 2 L0 26 C3 25 6 24 10 25 C20 27 30 22 40 24 Z" dur="1.6s" repeatCount="indefinite" /></path></clipPath>
+                        <linearGradient id="flag-shade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="20" y2="0" spreadMethod="repeat">
+                            <stop offset="0" stop-color="#000" stop-opacity="0" /><stop offset="0.5" stop-color="#000" stop-opacity="0.2" /><stop offset="1" stop-color="#000" stop-opacity="0" />
+                            <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="-20 0" dur="1.6s" repeatCount="indefinite" />
+                        </linearGradient>
+                    </defs>
+                    <ellipse cx="62" cy="78" rx="26" ry="2.5" fill="rgba(30, 86, 71, 0.3)" />
+                    <!-- Florida: white field, red saltire, state seal. Shorter pole, flies below the US flag. -->
+                    <rect x="39" y="12" width="2.2" height="66" fill="#c9c3b3" /><circle cx="40.1" cy="11" r="2.2" fill="#f6d18a" />
+                    <g transform="translate(0 16)" clip-path="url(#flag-wave)">
+                        <rect x="-2" y="-3" width="44" height="31" fill="#fff" />
+                        <path d="M0 0 L40 24 M40 0 L0 24" stroke="#c8102e" stroke-width="4.5" />
+                        <circle cx="20" cy="12" r="4.2" fill="#f5d58f" stroke="#fff" stroke-width="0.8" /><circle cx="20" cy="12" r="2" fill="#5aa0c8" />
+                        <rect x="-2" y="-3" width="44" height="31" fill="url(#flag-shade)" />
+                    </g>
+                    <!-- United States: canton at the hoist (pole side). Taller pole. -->
+                    <rect x="84" y="2" width="2.4" height="76" fill="#c9c3b3" /><circle cx="85.2" cy="2" r="2.4" fill="#f6d18a" />
+                    <g transform="translate(44 6)" clip-path="url(#flag-wave)">
+                        <rect x="-2" y="-3" width="44" height="31" fill="#b22234" />
+                        <path d="M-2 2.77 H42 M-2 6.46 H42 M-2 10.15 H42 M-2 13.85 H42 M-2 17.54 H42 M-2 21.23 H42" stroke="#fff" stroke-width="1.85" />
+                        <rect x="23" y="-3" width="19" height="16" fill="#3c3b6e" />
+                        <g fill="#fff"><circle cx="26" cy="1.5" r="0.7" /><circle cx="30" cy="1.5" r="0.7" /><circle cx="34" cy="1.5" r="0.7" /><circle cx="38" cy="1.5" r="0.7" /><circle cx="28" cy="4.5" r="0.7" /><circle cx="32" cy="4.5" r="0.7" /><circle cx="36" cy="4.5" r="0.7" /><circle cx="26" cy="7.5" r="0.7" /><circle cx="30" cy="7.5" r="0.7" /><circle cx="34" cy="7.5" r="0.7" /><circle cx="38" cy="7.5" r="0.7" /><circle cx="28" cy="10.5" r="0.7" /><circle cx="32" cy="10.5" r="0.7" /><circle cx="36" cy="10.5" r="0.7" /></g>
+                        <rect x="-2" y="-3" width="44" height="31" fill="url(#flag-shade)" />
+                    </g>
+                </svg>
+            </div>
+
+            @switch (_season)
+            {
+                case "christmas":
+                    <div class="decor decor-lit" style="left:160px; top:335px">
+                        <svg viewBox="0 -2 50 72" width="50" height="72">
+                            <rect x="22" y="56" width="6" height="12" fill="#7c6545" />
+                            <polygon points="25,6 42,28 8,28" fill="#2e7a62" /><polygon points="25,6 42,28 25,28" fill="#225d4b" />
+                            <polygon points="25,16 45,42 5,42" fill="#2e7a62" /><polygon points="25,16 45,42 25,42" fill="#225d4b" />
+                            <polygon points="25,28 48,58 2,58" fill="#2e7a62" /><polygon points="25,28 48,58 25,58" fill="#225d4b" />
+                            <g class="xmas-bulbs"><circle cx="18" cy="24" r="2.4" fill="#e56b6f" /><circle cx="31" cy="21" r="2.4" fill="#5aa0c8" /><circle cx="14" cy="38" r="2.4" fill="#f6d18a" /><circle cx="34" cy="36" r="2.4" fill="#e56b6f" /><circle cx="22" cy="50" r="2.4" fill="#5aa0c8" /><circle cx="38" cy="52" r="2.4" fill="#f6d18a" /><circle cx="10" cy="53" r="2.4" fill="#e56b6f" /></g>
+                            <polygon points="25,0 27.4,5 33,5.4 28.6,8.8 30.2,14 25,11 19.8,14 21.4,8.8 17,5.4 22.6,5" fill="#f6d18a" />
+                            <rect x="30" y="61" width="9" height="8" fill="#d35f46" /><rect x="33.5" y="61" width="2" height="8" fill="#f6d18a" /><rect x="11" y="62" width="8" height="7" fill="#5aa0c8" /><rect x="14" y="62" width="2" height="7" fill="#fff0bc" />
+                        </svg>
+                    </div>
+                    <div class="decor" style="left:600px; top:610px">
+                        <svg viewBox="0 0 36 50" width="36" height="50">
+                            <ellipse cx="18" cy="48" rx="14" ry="2.5" fill="rgba(30, 86, 71, 0.3)" />
+                            <line x1="11" y1="22" x2="2" y2="16" stroke="#7c6545" stroke-width="1.5" /><line x1="25" y1="22" x2="34" y2="17" stroke="#7c6545" stroke-width="1.5" />
+                            <circle cx="18" cy="38" r="10" fill="#f4f7f8" /><circle cx="18" cy="23" r="7.5" fill="#f4f7f8" /><circle cx="18" cy="11" r="6" fill="#f4f7f8" />
+                            <circle cx="18" cy="22" r="0.9" fill="#1f2d33" /><circle cx="18" cy="27" r="0.9" fill="#1f2d33" />
+                            <rect x="11" y="16" width="14" height="3" rx="1.5" fill="#d35f46" /><rect x="20" y="17" width="3" height="8" fill="#d35f46" />
+                            <circle cx="16" cy="10" r="0.9" fill="#1f2d33" /><circle cx="20" cy="10" r="0.9" fill="#1f2d33" /><polygon points="18,12 25,13 18,14" fill="#f59b54" />
+                            <rect x="12" y="1" width="12" height="5" fill="#1f2d33" /><rect x="10" y="5.5" width="16" height="1.8" fill="#1f2d33" />
+                        </svg>
+                    </div>
+                    break;
+                case "halloween":
+                    @foreach (var (x, y) in new[] { (360, 478), (718, 875), (1045, 965) })
+                    {
+                        <div class="decor decor-lit" style="left:@($"{x}px"); top:@($"{y}px")">
+                            <svg viewBox="0 0 28 24" width="28" height="24">
+                                <ellipse cx="14" cy="14" rx="13" ry="9.5" fill="#e88a3a" /><ellipse cx="14" cy="14" rx="7" ry="9.5" fill="#f59b54" /><ellipse cx="14" cy="14" rx="2.5" ry="9.5" fill="#e88a3a" />
+                                <rect x="12.5" y="2" width="3" height="4.5" rx="1" fill="#5d7a3a" />
+                                <g class="pumpkin-face" fill="#ffd36b"><polygon points="7,11 11,11 9,8" /><polygon points="17,11 21,11 19,8" /><path d="M7 15 Q14 21 21 15 L18.5 16.5 L17 15.5 L14 17 L11 15.5 L9.5 16.5 Z" /></g>
+                            </svg>
+                        </div>
+                    }
+                    <div class="decor" style="left:545px; top:975px">
+                        <svg viewBox="0 0 70 36" width="70" height="36">
+                            <ellipse cx="35" cy="33" rx="33" ry="3" fill="rgba(30, 86, 71, 0.3)" />
+                            <path d="M4 33 V14 a9 9 0 0 1 18 0 V33 Z" fill="#9aa39a" /><path d="M26 33 V10 a10 10 0 0 1 20 0 V33 Z" fill="#b3bbb2" /><path d="M50 33 V16 a8 8 0 0 1 16 0 V33 Z" fill="#9aa39a" />
+                            <text x="36" y="21" font-size="6" font-weight="800" text-anchor="middle" fill="#6b746b">RIP</text>
+                            <path d="M58 19 v9 M55 22 h6" stroke="#7d867d" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="decor decor-ghost" style="left:548px; top:945px">
+                        <svg viewBox="0 0 30 36" width="30" height="36">
+                            <path d="M3 34 V15 a12 12 0 0 1 24 0 V34 l-4 -3 -4 3 -4 -3 -4 3 -4 -3 z" fill="#f4f7f8" />
+                            <circle cx="11" cy="15" r="2" fill="#1f2d33" /><circle cx="19" cy="15" r="2" fill="#1f2d33" /><ellipse cx="15" cy="22" rx="2" ry="3" fill="#1f2d33" />
+                        </svg>
+                    </div>
+                    break;
+                case "thanksgiving":
+                    <div class="decor" style="left:960px; top:1025px">
+                        <svg viewBox="0 0 64 28" width="64" height="28">
+                            <rect x="2" y="8" width="30" height="18" rx="4" fill="#e3b95a" /><rect x="30" y="10" width="30" height="16" rx="4" fill="#d9a94a" />
+                            <path d="M2 14 H32 M2 20 H32 M30 16 H60 M30 21 H60" stroke="#b98a35" stroke-width="1.2" />
+                            <rect x="12" y="8" width="2" height="18" fill="#9a6440" /><rect x="44" y="10" width="2" height="16" fill="#9a6440" />
+                            <ellipse cx="50" cy="7" rx="6" ry="4.5" fill="#e88a3a" /><rect x="49" y="1" width="2" height="3" fill="#5d7a3a" />
+                        </svg>
+                    </div>
+                    <div class="decor" style="left:1010px; top:1010px">
+                        <svg viewBox="0 0 40 56" width="40" height="56">
+                            <rect x="19" y="20" width="3" height="36" fill="#7c6545" /><rect x="4" y="24" width="32" height="3" fill="#7c6545" />
+                            <path d="M4 24 l-3 2 m3 -2 l-3 -2 M36 24 l3 2 m-3 -2 l3 -2" stroke="#e3b95a" stroke-width="1.5" />
+                            <path d="M8 24 H32 L30 40 H10 Z" fill="#c65b43" /><path d="M10 30 H30 M11 35 H29 M16 24 V40 M24 24 V40" stroke="#8f3f30" stroke-width="1" />
+                            <circle cx="20" cy="15" r="7" fill="#e8d5a8" /><circle cx="17.5" cy="14" r="1" fill="#2a1d15" /><circle cx="22.5" cy="14" r="1" fill="#2a1d15" /><path d="M17 18 q3 2 6 0" stroke="#2a1d15" stroke-width="0.9" fill="none" />
+                            <path d="M8 10 H32 L26 7 L24 1 H16 L14 7 Z" fill="#9a6440" />
+                        </svg>
+                    </div>
+                    <div class="decor" style="left:140px; top:615px">
+                        <div class="decor-roam">
+                            <svg viewBox="0 0 36 32" width="36" height="32">
+                                <path d="M4 22 A14 14 0 0 1 32 22 Z" fill="#9a6440" /><path d="M7 22 A11 11 0 0 1 29 22 Z" fill="#d35f46" /><path d="M10 22 A8 8 0 0 1 26 22 Z" fill="#e3b56c" />
+                                <rect x="19.5" y="15" width="4" height="7" fill="#8a5a3c" /><ellipse cx="18" cy="24" rx="7" ry="6" fill="#6b4329" />
+                                <circle cx="22" cy="14" r="3.2" fill="#8a5a3c" /><circle cx="22.8" cy="13.3" r="0.7" fill="#1d140e" /><polygon points="25,13.5 28,14.5 25,15.5" fill="#f5c976" />
+                                <path d="M23 16 q1.5 3 -0.5 5" stroke="#d35f46" stroke-width="1.6" fill="none" /><path d="M16 29 v3 M20 29 v3" stroke="#e3b56c" stroke-width="1.4" />
+                            </svg>
+                        </div>
+                    </div>
+                    break;
+                case "easter":
+                    @for (var i = 0; i < _eggs.Length; i++)
+                    {
+                        var egg = i;
+                        if (_eggsFound.Contains(egg)) continue;
+                        <span class="decor easter-egg egg-@(egg % 3)" style="left:@($"{_eggs[egg].X}px"); top:@($"{_eggs[egg].Y}px")" @onclick="() => FindEgg(egg)">
+                            <svg viewBox="0 0 16 20" width="16" height="20">
+                                <ellipse cx="8" cy="11" rx="7" ry="9" class="egg-shell" />
+                                <path d="M1.5 9 q3.25 -2 6.5 0 t6.5 0" stroke="#fff" stroke-width="1.6" fill="none" /><path d="M1.2 14 q3.4 2 6.8 0 t6.8 0" stroke="#fff" stroke-width="1.6" fill="none" />
+                            </svg>
+                        </span>
+                    }
+                    <div class="decor" style="left:540px; top:965px">
+                        <div class="decor-roam decor-roam-wide">
+                            <svg class="bunny-hop" viewBox="0 0 30 34" width="30" height="34">
+                                <ellipse cx="15" cy="33" rx="11" ry="1.6" fill="rgba(30, 86, 71, 0.3)" />
+                                <ellipse cx="17" cy="25" rx="9" ry="7" fill="#f4f7f8" /><circle cx="25" cy="24" r="3" fill="#fff" />
+                                <ellipse cx="8" cy="7" rx="1.8" ry="5.5" fill="#f4f7f8" /><ellipse cx="12" cy="7" rx="1.8" ry="5.5" fill="#f4f7f8" transform="rotate(12 12 7)" />
+                                <ellipse cx="8" cy="7.5" rx="0.8" ry="3.8" fill="#f7a8c4" /><ellipse cx="12" cy="7.5" rx="0.8" ry="3.8" fill="#f7a8c4" transform="rotate(12 12 7)" />
+                                <circle cx="10" cy="17" r="5.5" fill="#f4f7f8" /><circle cx="8.5" cy="16.5" r="0.9" fill="#1f2d33" /><circle cx="5" cy="18.5" r="0.9" fill="#f7a8c4" />
+                                <ellipse cx="13" cy="31" rx="3" ry="1.5" fill="#e6eaec" /><ellipse cx="21" cy="31" rx="3" ry="1.5" fill="#e6eaec" />
+                            </svg>
+                        </div>
+                    </div>
+                    break;
+                case "summer":
+                    <div class="decor" style="left:1215px; top:1400px">
+                        <svg viewBox="0 0 130 120" width="180" height="166">
+                            <path d="M12 118 V44 M36 118 V44 M12 70 L36 90 M36 70 L12 90" stroke="#9aa39a" stroke-width="3" />
+                            <path d="M40 44 C70 58 84 22 124 14" stroke="#5aa0c8" stroke-width="11" fill="none" stroke-linecap="round" />
+                            <path class="slide-water" d="M40 44 C70 58 84 22 124 14" stroke="#bfe6f2" stroke-width="4" fill="none" stroke-dasharray="6 8" stroke-linecap="round" />
+                            <rect x="6" y="38" width="36" height="8" rx="2" fill="#f5c976" /><path d="M8 38 V30 H40 V38" stroke="#fff" stroke-width="2" fill="none" />
+                            <g><circle r="4.5" fill="#e36d3d" /><circle cy="-5" r="3" fill="#eab48c" />
+                                <animateMotion dur="6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1" keyTimes="0;0.55;0.8;1" path="M40 44 C70 58 84 22 124 14" />
+                                <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.8;0.82;1" dur="6s" repeatCount="indefinite" /></g>
+                            <circle cx="124" cy="14" r="4" fill="none" stroke="#fff" stroke-width="1.5">
+                                <animate attributeName="r" values="0;0;4;14" keyTimes="0;0.79;0.8;1" dur="6s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.79;0.8;1" dur="6s" repeatCount="indefinite" /></circle>
+                        </svg>
+                    </div>
+                    @foreach (var (x, y, color) in new[] { (1330, 1250, "#f7a8c4"), (1405, 1195, "#f5c976") })
+                    {
+                        <div class="decor decor-tube" style="left:@($"{x}px"); top:@($"{y}px")">
+                            <svg viewBox="0 0 30 18" width="30" height="18"><ellipse cx="15" cy="9" rx="12" ry="6" fill="none" stroke="@color" stroke-width="5" /><ellipse cx="15" cy="9" rx="12" ry="6" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="6 10" /></svg>
+                        </div>
+                    }
+                    <div class="decor" style="left:1050px; top:1300px">
+                        <svg viewBox="0 0 56 50" width="56" height="50">
+                            <rect x="4" y="36" width="30" height="12" rx="1" fill="#5aa0c8" /><path d="M4 40 H34 M4 44 H34" stroke="#fff" stroke-width="1.5" />
+                            <line x1="32" y1="16" x2="36" y2="46" stroke="#7c6545" stroke-width="2" />
+                            <path d="M10 18 Q31 -6 52 18 Z" fill="#e56b6f" /><path d="M24 18 Q31 1 38 18 Z" fill="#fff8e6" />
+                        </svg>
+                    </div>
+                    break;
+            }
+
+
+            @foreach (var item in _scenery)
+            {
+                <span class="scenery scenery-@item.Kind" style="left:@($"{item.X}px"); top:@($"{item.Y}px")"></span>
+            }
+
+            @foreach (var location in _locations)
+            {
+                <button class="world-location @(IsNearby(location) ? "location-nearby" : string.Empty) @(ActiveLocation?.Id == location.Id ? "location-active" : string.Empty)" style="left:@($"{location.X}px"); top:@($"{location.Y}px")" @onclick="() => Inspect(location)" aria-label="Inspect @location.Name">
+                    <span class="location-building location-building-@location.Id">@location.Icon@if (_season == "christmas" && location.Id is "home" or "work" or "ski" or "church") { <span class="xmas-lights"></span> }</span>
+                    <span class="location-name">@location.Name</span>
+                </button>
+            }
+
+            <div class="world-shade"></div>
+            @foreach (var (x, y) in _fireflies)
+            {
+                <i class="firefly" style="left:@($"{x}px"); top:@($"{y}px")"></i>
+            }
+            @foreach (var puff in _dust)
+            {
+                <i @key="puff.Id" class="dust-puff" style="left:@($"{puff.X}px"); top:@($"{puff.Y}px")"></i>
+            }
+            @if (_honking)
+            {
+                <span class="speech speech-honk" style="left:@($"{_playerX}px"); top:@($"{_playerY}px")">HONK!</span>
+            }
+
+            <div class="world-truck world-truck-@Vehicle.Id" style="@TruckStyle" aria-label="Your @Vehicle.Name" @onpointerdown="StartDrag" @onpointermove="Drag" @onpointerup="StopDrag" @onpointercancel="StopDrag">
+                <span class="truck-body"><span class="truck-bed"></span><span class="truck-cab"></span><span class="truck-hood"></span></span><i class="truck-wheel wheel-front"></i><i class="truck-wheel wheel-back"></i>
+            </div>
+        </div>
+        <div class="world-weather" aria-hidden="true"></div>
+        @if (_season == "christmas")
+        {
+            <div class="sky-sleigh" aria-hidden="true">
+                <svg viewBox="0 -4 160 48" width="160" height="48">
+                    <path d="M60 22 L108 20 M60 22 L136 18" stroke="#8a5a3c" stroke-width="1" />
+                    <g fill="#8a5a3c">
+                        <ellipse cx="112" cy="24" rx="9" ry="4.5" /><rect x="104" y="26" width="2" height="8" /><rect x="118" y="26" width="2" height="8" /><ellipse cx="123" cy="18" rx="3.5" ry="3" /><path d="M117 22 L122 17" stroke="#8a5a3c" stroke-width="3" />
+                        <ellipse cx="140" cy="22" rx="9" ry="4.5" /><rect x="132" y="24" width="2" height="8" /><rect x="146" y="24" width="2" height="8" /><ellipse cx="151" cy="16" rx="3.5" ry="3" /><path d="M145 20 L150 15" stroke="#8a5a3c" stroke-width="3" />
+                    </g>
+                    <path d="M122 15 l-2 -5 m2 5 l3 -5 M150 13 l-2 -5 m2 5 l3 -5" stroke="#6b4329" stroke-width="1.2" fill="none" /><circle cx="155" cy="16" r="1.6" fill="#e5484d" />
+                    <circle cx="26" cy="16" r="6" fill="#8a5a3c" />
+                    <circle cx="40" cy="16" r="7" fill="#d35f46" /><circle cx="40" cy="7" r="4" fill="#eab48c" /><path d="M36 8 Q40 15 44 8 Z" fill="#fff" /><path d="M36 5 L41 -1 L44 5 Z" fill="#d35f46" /><circle cx="41" cy="-1" r="1.2" fill="#fff" />
+                    <path d="M8 26 Q8 36 20 36 H58 Q64 36 64 28 V20 H30 Q24 20 22 26 Z" fill="#d35f46" /><path d="M6 40 H60 Q66 40 66 35" stroke="#f6d18a" stroke-width="2" fill="none" />
+                </svg>
+            </div>
+        }
+        @if (_season == "halloween")
+        {
+            @for (var bat = 0; bat < 3; bat++)
+            {
+                <svg class="sky-bat" viewBox="0 0 40 16" width="34" height="14" aria-hidden="true"><path class="bat-wings" d="M20 8 C16 2 10 2 2 6 C7 7 9 9 10 12 C13 9 16 9 20 11 C24 9 27 9 30 12 C31 9 33 7 38 6 C30 2 24 2 20 8 Z" fill="#2a1d2e" /></svg>
+            }
+        }
+    </div>
+
+    @if (ActiveLocation is not null)
+    {
+        <aside class="world-panel" @onclick:stopPropagation="true">
+            @if (ActiveLocation.Id == "work")
+            {
+                <div class="office-interior-screen">
+                    <div class="office-topbar"><button @onclick="ClosePanel">← Back outside</button><span>SOFTWARE ENGINEERING / @(SelectedWorkStation is null ? "OFFICE FLOOR" : "CUBICLE")</span><strong>WORK // BUILDING 01</strong></div>
+                    @if (SelectedWorkStation is null)
+                    {
+                        <div class="office-room">
+                            <div class="office-sign"><span>COLE'S</span><strong>WORK</strong><small>SELECT A DOOR TO ENTER</small></div>
+                            <div class="office-floor"></div>
+                            <div class="office-doors">
+                                @foreach (var station in _workStations)
+                                {
+                                    <button class="office-door" @onclick="() => SelectWorkStation(station)">
+                                        <span class="door-number">0@(Array.IndexOf(_workStations, station) + 1)</span>
+                                        <span class="door-screen">@station.Icon</span>
+                                        <strong>@station.ShortName</strong>
+                                        <small>@station.Company</small>
+                                        <em>ENTER →</em>
+                                    </button>
+                                }
+                            </div>
+                            <p class="office-floor-note">A small office floor for the systems, people, and problems that shaped the work.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="cubicle-inside">
+                            <button class="inside-back" @onclick="ClearWorkStation">← OFFICE FLOOR</button>
+                            <div class="cubicle-window"><span>NOW ENTERING</span><strong>@SelectedWorkStation.Company</strong><small>@SelectedWorkStation.Title</small></div>
+                            <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@ShowProjectLog"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div>@if (MemoriesFor(SelectedWorkStation.Id).FirstOrDefault() is { } framed) { <button class="inside-photo-frame" @onclick="ToggleTeamPhotos" aria-pressed="@ShowTeamPhotos"><img src="@framed.ImagePath" alt="" /><small>TEAM PHOTOS</small></button> }</div>
+                            @if (ShowProjectLog)
+                            {
+                                <div class="project-log-desk">
+                                    <div class="project-log-heading"><span>PROJECT LOG</span><strong>@SelectedWorkStation.Company</strong><small>Select a sheet to inspect the work.</small></div>
+                                    <div class="project-papers">
+                                        @foreach (var project in SelectedWorkStation.Projects)
+                                        {
+                                            <button class="project-paper @(SelectedProject?.Id == project.Id ? "paper-selected" : string.Empty)" @onclick="() => SelectProject(project)">
+                                                <span class="paper-pin"></span><strong>@project.Title</strong><small>@project.Summary</small><em>@project.Technologies</em>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                                @if (SelectedProject is not null)
+                                {
+                                    <article class="project-monitor-detail"><div class="monitor-detail-bar"><span></span><span></span><span></span><small>PROJECT LOG // @SelectedWorkStation.ShortName</small></div><div class="monitor-detail-screen"><span class="panel-category">PROJECT DETAIL</span><h2>@SelectedProject.Title</h2><p>@SelectedProject.Detail</p><span class="paper-tech">@SelectedProject.Technologies</span></div></article>
+                                }
+                            }
+                            else if (ShowTeamPhotos)
+                            {
+                                <div class="garage-pegboard cubicle-pegboard">
+                                    @foreach (var memory in MemoriesFor(SelectedWorkStation.Id))
+                                    {
+                                        <figure class="pinned-photo"><span class="paper-pin"></span><img src="@memory.ImagePath" alt="@memory.Alt" /><figcaption><strong>@memory.Caption</strong><small>@memory.Description</small></figcaption></figure>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <article class="inside-data"><span class="panel-category">@SelectedWorkStation.Company</span><h1>@SelectedWorkStation.Title</h1><p>@SelectedWorkStation.Description</p><div class="inside-tech"><span>TECHNOLOGIES</span><div>@foreach (var technology in SelectedWorkStation.Technologies) { <b>@technology</b> }</div></div><p class="monitor-hint">Click the monitor to open the project log.</p></article>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else if (ActiveLocation.Id is "fishing" or "camp" or "church" or "golf" or "ski")
+            {
+                <div class="life-interior-screen">
+                    <div class="life-topbar"><button @onclick="ClosePanel">← Back outside</button><span>@ActiveLocation.Name / MEMORY ROOM</span><strong>COLE'S WORLD</strong></div>
+                    <div class="life-scene life-scene-@ActiveLocation.Id">
+                        <div class="life-scene-title"><span>@ActiveLocation.Category</span><h1>@ActiveLocation.Name</h1><small>@ActiveLocation.Subtitle</small></div>
+                        <div class="life-set-piece life-set-piece-@ActiveLocation.Id" aria-hidden="true"></div>
+                        @MemoryWall(ActiveLocation.Id)
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="home-interior-screen">
+                    <div class="office-topbar">@if (HomeRoom is null) { <button @onclick="ClosePanel">← Back outside</button> } else { <button @onclick="() => EnterHomeRoom(null)">← Front yard</button> }<span>HOME / @(HomeRoom switch { "garage" => "GARAGE", "house" => "INSIDE", _ => "FRONT YARD" })</span><strong>HOME BASE</strong></div>
+                    @if (HomeRoom is null)
+                    {
+                        <div class="home-front">
+                            <div class="home-front-title"><span>@ActiveLocation.Category</span><h1>@ActiveLocation.Name</h1><small>@ActiveLocation.Subtitle</small></div>
+                            <div class="house-facade">
+                                <div class="house-roof"></div>
+                                <div class="house-wall">
+                                    <span class="house-window" aria-hidden="true"></span>
+                                    <button class="house-door" @onclick='() => EnterHomeRoom("house")'><span>FRONT DOOR</span></button>
+                                    <button class="house-garage" @onclick='() => EnterHomeRoom("garage")'><span>GARAGE</span></button>
+                                </div>
+                            </div>
+                            <p class="home-front-note">Bought my first home in 2025. Outside of software development, I spend a lot of time working on projects around the house, from electrical work and landscaping to building things in the yard.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (HomeRoom == "house")
+                        {
+                            <div class="life-scene life-scene-house">
+                                <div class="life-scene-title"><span>INSIDE THE HOUSE</span><h1>Home</h1><small>A few of the moments that made it home.</small></div>
+                                @MemoryWall("house")
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="home-room home-room-garage">
+                                <div class="garage-vehicles">
+                                    @foreach (var vehicle in _garageVehicles)
+                                    {
+                                        <button class="garage-vehicle @(SelectedVehicle == vehicle.Id ? "garage-vehicle-selected" : string.Empty)" @onclick="() => SelectVehicle(vehicle.Id)"><span>@vehicle.Icon</span><strong>@vehicle.Name</strong></button>
+                                    }
+                                </div>
+                                @if (SelectedVehicle is null)
+                                {
+                                    <p class="garage-hint">Pick a ride to see the pictures pinned to the pegboard.</p>
+                                }
+                                else
+                                {
+                                    <div class="garage-pegboard">
+                                        @foreach (var memory in MemoriesFor(SelectedVehicle))
+                                        {
+                                            <figure class="pinned-photo"><span class="paper-pin"></span><img src="@memory.ImagePath" alt="@memory.Alt" /><figcaption><strong>@memory.Caption</strong><small>@memory.Description</small></figcaption></figure>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </aside>
+    }
+
+    @if (ShowMinimap)
+    {
+        <div class="world-minimap" @onclick:stopPropagation="true">
+            <div class="minimap-title">MAP <button @onclick="ToggleMinimap" aria-label="Close map">×</button></div>
+            <svg class="minimap-map" viewBox="0 0 1500 1500" role="img" aria-label="Map of Cole's World">
+                <rect width="1500" height="1500" fill="#79b99d" />
+                <polygon points="890,290 1130,-20 1370,290" fill="#6f9a8c" /><polygon points="1072,54 1130,-20 1188,54" fill="#f2ead0" />
+                <polygon points="1120,330 1310,120 1500,330" fill="#587f73" /><polygon points="1264,170 1310,120 1356,170" fill="#f2ead0" />
+                <path d="@RiverPath" fill="none" stroke="#5facc0" stroke-width="44" stroke-linecap="round" />
+                <ellipse cx="1350" cy="1165" rx="220" ry="155" transform="rotate(-12 1350 1165)" fill="#5facc0" stroke="#e9dcb5" stroke-width="16" />
+                @foreach (var tree in _scenery.Where(item => item.Kind is "oak" or "pine"))
+                {
+                    <circle cx="@tree.X" cy="@(tree.Y - 20)" r="18" fill="@(tree.Kind == "pine" ? "#225d4b" : "#2f806a")" />
+                }
+                @foreach (var road in _mapRoads)
+                {
+                    <rect x="@road.X" y="@road.Y" width="@road.W" height="@road.H" fill="#e9dcb5" stroke="#e9dcb5" stroke-width="28" />
+                }
+                @foreach (var road in _mapRoads)
+                {
+                    <rect x="@road.X" y="@road.Y" width="@road.W" height="@road.H" fill="#56635f" />
+                }
+                <line x1="0" y1="706" x2="1500" y2="706" stroke="#fff0bc" stroke-width="8" stroke-dasharray="50 40" />
+                <rect x="1378" y="650" width="64" height="112" fill="#a87450" />
+                @foreach (var location in _locations)
+                {
+                    <g class="mm-place mm-place-@location.Id @(IsNearby(location) ? "mm-place-near" : string.Empty)">
+                        <circle cx="@location.X" cy="@location.Y" r="48" />
+                        <text x="@location.X" y="@(location.Y - 72)">@(location.Id switch { "work" => "Work", "fishing" => "Dock", _ => location.Name })</text>
+                        <title>@location.Name</title>
+                    </g>
+                }
+                <circle class="mm-player-ring" cx="@_playerX" cy="@_playerY" r="44" />
+                <circle class="mm-player" cx="@_playerX" cy="@_playerY" r="34" />
+            </svg>
+            <p>@(NearbyLocation is { } near ? $"Near {near.Name}" : "Drive to discover places")</p>
+        </div>
+    }
+
+    @if (NearbyLocation is not null && ActiveLocation is null)
+    {
+        <button class="interact-prompt" @onclick="Interact"><span class="prompt-keys"><span>↵</span> PRESS <strong>E</strong> TO ENTER</span><span class="prompt-touch">TAP TO ENTER</span> @NearbyLocation.Name</button>
+    }
+
+    @if (NearMailbox && ActiveLocation is null && !_showMailbox)
+    {
+        <button class="interact-prompt" @onclick="OpenMailbox"><span class="prompt-keys"><span>↵</span> PRESS <strong>E</strong> TO CHECK</span><span class="prompt-touch">TAP TO OPEN</span> Mailbox</button>
+    }
+
+    @if (_showMailbox)
+    {
+        <div class="welcome-backdrop" @onclick="CloseMailbox">
+            <div class="mail-letter" role="dialog" aria-labelledby="mail-title" @onclick:stopPropagation="true">
+                <span class="panel-category">You've got mail</span>
+                <h1 id="mail-title">Let's talk</h1>
+                <p>Thanks for driving around! I'm always happy to talk about software engineering roles, .NET and Azure work, or anything you spotted in here.</p>
+                <div class="mail-links">
+                    <a href="mailto:cole@colespitzer.com">✉ cole@colespitzer.com</a>
+                    <a href="https://www.linkedin.com/in/cole-spitzer-39945a1a5" target="_blank" rel="noopener">in &nbsp;Connect on LinkedIn</a>
+                    <a href="/resume/Cole-Spitzer-Resume.pdf" download>⬇ Download my résumé</a>
+                </div>
+                <button class="welcome-start" @onclick="CloseMailbox">Back to driving</button>
+            </div>
+        </div>
+    }
+
+    @if (_showWelcome)
+    {
+        <div class="welcome-backdrop">
+            <div class="welcome-card" role="dialog" aria-labelledby="welcome-title">
+                <span class="panel-category">Welcome</span>
+                <h1 id="welcome-title">This is Cole's World</h1>
+                <p>A playful side of my portfolio. Drive around to visit the places, people, and hobbies that make me who I am. Looking for my experience instead? It's one click away.</p>
+                <ul class="welcome-controls">
+                    <li><b>WASD</b> / <b>Arrows</b> drive &nbsp;·&nbsp; on phones, drag the truck</li>
+                    <li><b>E</b> enter a place &nbsp;·&nbsp; <b>ESC</b> back out</li>
+                    <li><b>M</b> map &nbsp;·&nbsp; <b>H</b> honk</li>
+                </ul>
+                <p class="welcome-tip">Tip: stop by the mailbox by my house to get in touch.</p>
+                <div class="welcome-actions"><button class="welcome-start" @onclick="DismissWelcome">Start exploring</button><a class="welcome-skip" href="/experience">Skip to résumé →</a></div>
+            </div>
+        </div>
+    }
+
+    @if (_secretToast is not null)
+    {
+        <div class="secret-toast" role="status">@_secretToast</div>
+    }
+
+    <div class="world-controls"><span data-short="WASD  DRIVE" data-touch="DRAG TO DRIVE"><b>WASD</b> / <b>ARROWS</b> Drive</span><button @onclick="Interact" data-short="E  ENTER" data-touch="ENTER"><b>E</b> Interact</button><button @onclick="ToggleMinimap" data-short="M  MAP" data-touch="MAP"><b>M</b> Map</button><button @onclick="Honk" data-short="H  HONK" data-touch="HONK"><b>H</b> Honk</button><button @onclick="ClosePanel" data-short="ESC  CLOSE" data-touch="CLOSE"><b>ESC</b> Close</button><button @onclick="ReturnHome" data-short="R  HOME" data-touch="HOME"><b>R</b> Return to home page</button></div>
+</section>
+
+@code {
+    private const int WorldSize = 1500;
+    private int _playerX = 300;
+    private int _playerY = 650;
+    private bool ShowMinimap;
+    private WorldLocation? ActiveLocation { get; set; }
+    private string? HomeRoom { get; set; }
+    private string? SelectedVehicle { get; set; }
+    private WorkStation? SelectedWorkStation { get; set; }
+    private WorldMemory? SelectedWorldMemory { get; set; }
+    private WorkProject? SelectedProject { get; set; }
+    private bool ShowProjectLog { get; set; }
+    private bool ShowTeamPhotos { get; set; }
+    private double _truckAngle;
+    private bool _truckFacingLeft;
+    private readonly HashSet<string> _pressedKeys = new();
+    private CancellationTokenSource? _driving;
+    private (double X, double Y)? _dragStart;
+    private double _dragX, _dragY;
+
+    private readonly WorkStation[] _workStations =
+    {
+        new("Deloitte", "Deloitte", "Florida Department of Children and Families", "Caseworker platform", "Worked on modernizing a web application used by the department, including a data comparison tool that helps caseworkers process cases.", "▣", new[] { "C#", ".NET", "Blazor", "SQL", "Azure" }, new[]
+    {
+            new WorkProject("wizards", "FLDCF Wizards", "Caseworker comparison tool", "Built a data comparison tool that aggregates government sources to help caseworkers process Medicaid, SNAP, and TANF applications.", "C# · .NET · Azure · React"),
+            new WorkProject("datamart", "Datamart", "103M+ row data pipeline", "Built a daily batch job that aggregates data and writes complete SFTP output in under eight minutes for teams validating a system migration.", "C# · .NET · Batch · MSSQL · Oracle"),
+            new WorkProject("portal", "FLDCF Worker Portal", "Modernization foundation", "Led a five-developer team delivering UI features and integrations for a multi-year modernization program.", "C# · .NET · React · Azure · MSSQL")
+    }),
+        new("brown", "B&B", "Brown & Brown", "Insurance systems", "Built applications supporting insurance brokers, secure file sharing, compliance automation, and modernized legacy systems.", "▣", new[] { "C#", ".NET", "React", "SQL", "Azure" }, new[]
+    {
+            new WorkProject("eando", "Monthly E&O Survey", "Monthly compliance automation", "Conceptualized and developed a monthly compliance survey sent to more than 6,000 teammates to keep the company aligned with legal standards.", "Azure Logic Apps · C# · .NET · Power BI · Survey Monkey"),
+            new WorkProject("qualys", "Qualys Report", "Security visibility pipeline", "Built a daily pipeline that ingests Qualys vulnerability data into MSSQL and surfaces it in Power BI so security leaders can prioritize fixes.", "Power BI · Azure Data Factory · MSSQL"),
+            new WorkProject("jua", "JUA", "Secure file sharing", "Modernized a secure file-sharing site where users upload and download large files with granular security down to the file and folder level.", "Entra ID · C# · .NET · Blazor · Azure Blobs · MSSQL")
+    }),
+    };
+
+    private readonly WorldMemory[] _worldMemories =
+    {
+        new("fishing", "images/world/DogBeach.jpg", "Cole outdoors", "Dog Beach", "A quiet day outside, with time to slow down and enjoy being away from a screen."),
+        new("fishing", "images/world/BennyBeach.jpeg", "Cole holding a baby at the beach", "Beach day with Benny", "Soaking up the sun and the waves with little Benny."),
+        new("fishing", "images/world/Cruise.JPG", "Cole on a catamaran", "Cruise Time!", "A day out on the water, enjoying the scenery and the ride."),
+        new("fishing", "images/world/Kayak.jpg", "Cole kayaking at night", "Night paddle", "Out on the kayak after dark, when the water goes still."),
+        
+        new("camp", ImagePath: "images/world/IMG_1357.jpg", "Cole on an outdoor adventure", "Camp life", "Hammock camping, open air, and a little distance from the usual routine."),
+        new("camp", ImagePath: "images/world/Acadia.JPG", "Cole on a hike", "Acadia National park", "Exploring the trails and enjoying the natural beauty of Acadia National Park."),
+        new("camp", "images/world/Fourwheeling.JPG", "Cole on an ATV", "Four-wheeling", "Kicking up dirt on the four-wheelers."),
+        
+        new("church", "images/world/GraysonConfirmation.jpg", "", "Community and service", "The confirmation into the church of one of my students!"),
+        new("church", "images/world/Universal.jpg", "Cole with the youth group at Universal Studios", "Youth trip to Universal", "Taking the youth group to Universal for a night of rides and fun."),
+        new("church", "images/world/BusDriver.jpg", "Cole driving the youth group bus", "Bus driver duty", "Driving the youth group on a trip; everyone else got a nap."),
+        new("church", "images/world/DirtBikeGrayson.jpg", "Cole with confirman", "Celebration", "Celebrating confirmation with my confirmee Grayson."),
+       
+        new("golf", "images/world/NolesGame.jpg", "Cole at FSU", "Sports and competition", "A few favorite teams, and enjoying time with family."),
+        new("golf", "images/world/DiskGolf.jpeg", "Cole Disk Golfing", "Freindly competition with friends", "If your not first your last!"),
+        new("golf", "images/world/GatorGame.jpeg", "Cole at brothers bachelor party", "House Divided", "Gator game for my brothers bachelor party."),
+        
+        new("brown", "images/world/BrownTeam.jpg", "Cole with his Brown & Brown teammates in matching holiday shirts", "The team", "Matching shirts and all at the Brown & Brown holiday party."),
+        new("brown", "images/world/HippieHolidays.jpg", "Cole and teammates at the Hippie Holidays party", "Hippie Holidays", "Groovy and bright with the team at the holiday party."),
+        new("brown", "images/world/PeaceSanta.jpg", "Cole posing with Santa at the holiday party", "Peace, love & Santa", "Even Santa showed up to the Hippie Holidays party."),
+        new("brown", "images/world/BrownRooftop.jpg", "Cole with his former Brown & Brown manager on a rooftop overlooking the water", "With my old boss", "Taking in the view with my former manager at Brown & Brown."),
+        new("brown", "images/world/BrownHalloween.jpg", "Cole and teammates in Halloween costumes at the office", "Office Halloween", "Costume day with the team at Brown & Brown."),
+        new("house", "images/world/House.jpg", "Cole in front of his first home", "My first home", "Bought my first home in 2025."),
+        new("house", "images/world/Proposal.JPEG", "Cole proposing to his fiancée", "The proposal", "The day I asked my fiancée to marry me."),
+        new("house", "images/world/JulieWedding.jpg", "Cole with the bride at a friend's wedding", "Julie's wedding", "Celebrating my friend Julie on her big day."),
+        
+        new("bronco", "images/world/Bronco.jpg", "Cole driving his Bronco on an off-road trail", "2022 Ford Bronco", "Used for exploring, camping, hauling stuff, and generally getting into trouble."),
+        new("f150", "images/world/F150.jpg", "Cole's Ford F-150", "Ford F-150", ""),
+        new("dirtbike", "images/world/DirtbikeMud.JPG", "Cole racing his dirt bike through the mud", "2018 Honda CRF450R", "One of my hobbies outside of software development."),
+        new("dirtbike", "images/world/DirtbikeHump.jpg", "Cole racing his dirt bike", "Race day", "Aiming for first and tons of laughs."),
+        
+        new("ski", "images/world/Skiing.jpg", "Cole on an adventure", "Skiing new terrain", "Intermediate skier, mostly East Coast, always looking for the next mountain."),
+        new("ski", "images/world/HikingSeneca.jpg", "Cole at a mountain overlook", "Mountain views", "Hiking up to the overlook for a view of the ridgelines."),
+        new("ski", "images/world/ToyStory.jpg", "Cole and friends dressed as Toy Story characters in the snow", "To infinity and beyond", "Suiting up as the Toy Story crew for a day in the snow."),
+    };
+
+    // Decorative map scenery, anchored at its base (X, Y). Kinds: oak, pine, bush, flowers, rock, reeds.
+    private readonly (int X, int Y, string Kind)[] _scenery =
+    {
+        (560, 100, "pine"), (640, 170, "pine"), (700, 120, "pine"), (960, 250, "pine"), (1010, 300, "pine"), (1200, 340, "pine"),
+        (1260, 380, "pine"), (1475, 330, "pine"), (1480, 420, "pine"),
+        (95, 180, "oak"), (180, 240, "oak"), (120, 520, "oak"), (470, 200, "oak"), (560, 450, "oak"), (990, 480, "oak"),
+        (95, 910, "oak"), (210, 1180, "oak"), (360, 930, "oak"), (820, 1010, "oak"), (900, 1250, "oak"), (640, 1260, "oak"),
+        (1340, 880, "oak"), (520, 1400, "oak"), (80, 1400, "oak"),
+        (200, 560, "bush"), (420, 540, "bush"), (700, 560, "bush"), (950, 580, "bush"), (1200, 560, "bush"), (160, 820, "bush"),
+        (520, 880, "bush"), (760, 880, "bush"), (980, 860, "bush"), (300, 1330, "bush"), (780, 1400, "bush"), (1000, 1420, "bush"),
+        (140, 380, "flowers"), (420, 420, "flowers"), (600, 330, "flowers"), (1330, 620, "flowers"), (500, 1000, "flowers"),
+        (860, 1150, "flowers"), (330, 1250, "flowers"), (700, 1350, "flowers"),
+        (1010, 430, "rock"), (1180, 250, "rock"), (560, 1100, "rock"), (980, 1150, "rock"),
+        (1375, 600, "reeds"), (1460, 860, "reeds"), (1125, 1120, "reeds"), (1140, 1250, "reeds")
+    };
+
+    // Patches over the main road's edge where a side road joins (roads are 86px wide including borders).
+    // Y covers the main road's 7px border and edge line: top edge at 650, bottom edge at 762 - 20px patch.
+    private readonly (int X, int Y)[] _roadConnections =
+    {
+        (300, 650), (820, 650), (1110, 650), (650, 742), (430, 742), (1280, 742),
+        (1110, 742)
+    };
+
+    private readonly (string Id, string Name, string Icon)[] _garageVehicles =
+    {
+        ("bronco", "Ford Bronco", "🚙"), ("f150", "Ford F-150", "🛻"), ("dirtbike", "Dirtbike", "🏍")
+    };
+
+    private readonly List<WorldLocation> _locations = new()
+    {
+        new("home", "Home", "HOME BASE", "⌂", "Where the projects start", 300, 390),
+        new("work", "Software Engineering", "WORK", "▣", "Building systems that solve real problems", 820, 300),
+        new("ski", "Ski Lodge", "HOBBY AREA", "⛷", "A little farther up the mountain", 1110, 165),
+        new("camp", "Camping", "OUTDOORS", "⛺", "Away from the screen", 1110, 940),
+        new("fishing", "Fishing Dock", "OUTDOORS", "♧", "A quiet place to cast a line", 1280, 1130),
+        new("golf", "Sports", "INTERESTS", "⚾", "A few favorite teams and a moving target", 430, 1110),
+        new("church", "Church", "COMMUNITY", "✚", "A place to serve and gather", 650, 850)
+    };
+
+    private string CameraStyle => $"--player-x:{_playerX}px; --player-y:{_playerY}px";
+    // Drivable vehicles are the garage vehicles; starts in the F-150.
+    private int _vehicleIndex = 1;
+    private (string Id, string Name, string Icon) Vehicle => _garageVehicles[_vehicleIndex];
+    private void SwitchVehicle() => _vehicleIndex = (_vehicleIndex + 1) % _garageVehicles.Length;
+    private string TruckStyle => $"left:{_playerX}px; top:{_playerY}px; --truck-angle:{_truckAngle}deg; --truck-scale:{(_truckFacingLeft ? -1 : 1)}";
+    private WorldLocation? NearbyLocation => _locations.FirstOrDefault(IsNearby);
+
+    private void HandleKeyDown(KeyboardEventArgs args)
+    {
+        var key = args.Key.ToLowerInvariant();
+        if (_showWelcome) { if (key is "enter" or "escape" or "e" or " ") _ = DismissWelcome(); return; }
+        if (_showMailbox) { if (key is "enter" or "escape" or "e") CloseMailbox(); return; }
+        if (key == "m") { ToggleMinimap(); return; }
+        if (key == "escape") { GoBack(); return; }
+        if (key == "e") { Interact(); return; }
+        if (key == "r") { ReturnHome(); return; }
+        if (key == "v") { SwitchVehicle(); return; }
+        if (key == "h") { _ = Honk(); return; }
+        if (key == "n") { CycleTimeOfDay(); return; }
+        if (key is "arrowup" or "w" or "arrowdown" or "s" or "arrowleft" or "a" or "arrowright" or "d")
+        {
+            _pressedKeys.Add(key);
+            MoveFromPressedKeys();
+        }
+    }
+
+    // Touch screens: touch the truck and pull; it keeps driving toward the finger until released.
+    // Touch pointers are implicitly captured, so move/up events keep coming to the truck.
+    private async Task StartDrag(PointerEventArgs args)
+    {
+        if (args.PointerType == "mouse") return; // computers drive with WASD / arrows only
+        StopDrag();
+        _dragStart = (args.ClientX, args.ClientY);
+        _dragX = _dragY = 0;
+        var driving = _driving = new CancellationTokenSource();
+        while (!driving.IsCancellationRequested)
+        {
+            var length = Math.Sqrt(_dragX * _dragX + _dragY * _dragY);
+            if (length > 12)
+            {
+                MovePlayer((int)Math.Round(_dragX / length * 20), (int)Math.Round(_dragY / length * 20));
+                StateHasChanged();
+            }
+            await Task.Delay(80);
+        }
+    }
+
+    private void Drag(PointerEventArgs args)
+    {
+        if (_dragStart is not { } start) return;
+        _dragX = args.ClientX - start.X;
+        _dragY = args.ClientY - start.Y;
+    }
+
+    private void StopDrag()
+    {
+        _dragStart = null;
+        _driving?.Cancel();
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs args) => _pressedKeys.Remove(args.Key.ToLowerInvariant());
+
+    private void MoveFromPressedKeys()
+    {
+        var x = (_pressedKeys.Contains("arrowright") || _pressedKeys.Contains("d") ? 1 : 0) - (_pressedKeys.Contains("arrowleft") || _pressedKeys.Contains("a") ? 1 : 0);
+        var y = (_pressedKeys.Contains("arrowdown") || _pressedKeys.Contains("s") ? 1 : 0) - (_pressedKeys.Contains("arrowup") || _pressedKeys.Contains("w") ? 1 : 0);
+        if (x != 0 || y != 0) MovePlayer(x * 20, y * 20);
+    }
+
+    private void MovePlayer(int x, int y)
+    {
+        if (x != 0 || y != 0)
+        {
+            var angle = Math.Atan2(y, x) * 180 / Math.PI;
+            // If angle is between 90 and 180 (left-facing), flip the truck and mirror the angle
+            if (angle > 90)
+            {
+                _truckFacingLeft = true;
+                _truckAngle = 180 - angle;
+            }
+            else if (angle < -90)
+            {
+                _truckFacingLeft = true;
+                _truckAngle = -180 - angle;
+            }
+            else
+            {
+                _truckFacingLeft = false;
+                _truckAngle = angle;
+            }
+        }
+        var nextX = Math.Clamp(_playerX + x, 40, WorldSize - 40);
+        var nextY = Math.Clamp(_playerY + y, 40, WorldSize - 40);
+        if (!IsBlocked(nextX, nextY)) { KickUpDust(); _playerX = nextX; _playerY = nextY; }
+        ActiveLocation = null;
+    }
+
+    // Map characters: the dog sits by the home road, dad and son hang out on the pond's west bank. Positions are each drawing's center.
+    private readonly (int X, int Y) _dog = (415, 475), _fishers = (1123, 1185);
+
+    // What dad and son are up to follows the season: skating whenever the pond freezes (snow), fishing otherwise.
+    private string FamilyActivity => _weather == "snow" ? "skating" : _season switch { "easter" => "eggs", "thanksgiving" => "dinner", "halloween" => "pumpkin", _ => "fishing" };
+
+    // Shared by the river, its flow overlay and the minimap. Road rects mirror the .world-road CSS (main road + side roads).
+    private const string RiverPath = "M1330 320 C1340 420 1440 470 1425 560 S1395 800 1435 900 S1415 1000 1395 1070";
+    private readonly (int X, int Y, int W, int H)[] _mapRoads =
+    {
+        (0, 650, 1500, 112), (257, 440, 86, 250), (777, 350, 86, 340), (1067, 215, 86, 475),
+        (1067, 690, 86, 235), (607, 690, 86, 136), (387, 690, 86, 413), (1237, 690, 86, 458)
+    };
+    private bool IsBlocked(int x, int y) =>
+        _locations.Any(location => x > location.X - 90 && x < location.X + 90 && y > location.Y - 70 && y < location.Y + 70)
+        || new[] { _dog, _fishers }.Any(critter => Math.Abs(x - critter.X) < 70 && Math.Abs(y - critter.Y) < 55)
+        || (Math.Abs(x - _mailbox.X) < 28 && Math.Abs(y - (_mailbox.Y - 15)) < 30);
+
+    // The dog perks up when the truck pulls in close (just outside her no-drive zone) or when she's clicked.
+    private bool DogExcited => _dogPetted || (Math.Abs(_playerX - _dog.X) < 160 && Math.Abs(_playerY - _dog.Y) < 130);
+    private bool _dogPetted, _honking;
+
+    private async Task PetDog()
+    {
+        _dogPetted = true;
+        _ = FindSecret("dog");
+        await Task.Delay(1500);
+        _dogPetted = false;
+    }
+
+    // H honks: the dog barks and the fishermen complain until the bubbles fade.
+    private async Task Honk()
+    {
+        if (_honking) return;
+        _honking = true;
+        StateHasChanged();
+        await Task.Delay(1600);
+        _honking = false;
+        StateHasChanged();
+    }
+
+    // Time of day follows the visitor's clock (WebAssembly uses the browser's time zone); N cycles it.
+    private static readonly string[] TimesOfDay = { "day", "dusk", "night" };
+    private string _timeOfDay = DateTime.Now.Hour switch { >= 8 and < 18 => "day", (>= 6 and < 8) or (>= 18 and < 20) => "dusk", _ => "night" };
+    private void CycleTimeOfDay() => _timeOfDay = TimesOfDay[(Array.IndexOf(TimesOfDay, _timeOfDay) + 1) % TimesOfDay.Length];
+    private readonly (int X, int Y)[] _fireflies = { (1000, 1010), (1190, 960), (900, 1140), (560, 960), (250, 1250), (1290, 860), (700, 1310), (1050, 1360), (150, 700), (620, 520) };
+
+    // Dust: a puff at the truck's old spot every other step; only the last few stay mounted while their CSS fade plays.
+    private readonly Queue<(int Id, int X, int Y)> _dust = new();
+    private int _dustId;
+    private void KickUpDust()
+    {
+        if (++_dustId % 2 != 0) return;
+        _dust.Enqueue((_dustId, _playerX, _playerY));
+        if (_dust.Count > 6) _dust.Dequeue();
+    }
+
+    // Easter eggs: click the yeti or bear while they're showing, or pet the dog. Found secrets persist in localStorage.
+    private static readonly Dictionary<string, string> SecretNames = new() { ["yeti"] = "Yeti spotted!", ["bear"] = "Bear spotted!", ["dog"] = "You pet the dog!" };
+    private readonly HashSet<string> _secrets = new();
+    private string? _secretToast;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Moving between panel layers usually removes the button that was clicked, which drops focus to <body>
+        // and the section stops hearing keys (ESC, WASD). Pull focus back whenever the layer changes.
+        if (PanelLayer != _focusedLayer)
+        {
+            _focusedLayer = PanelLayer;
+            await _screen.FocusAsync(preventScroll: true);
+        }
+        if (!firstRender) return;
+        try
+        {
+            _showWelcome = await JS.InvokeAsync<string?>("localStorage.getItem", "world-welcomed") is null;
+            var saved = await JS.InvokeAsync<string?>("localStorage.getItem", "world-secrets");
+            _secrets.UnionWith((saved ?? "").Split(',').Where(SecretNames.ContainsKey));
+            if (_secrets.Count > 0 || _showWelcome) StateHasChanged();
+        }
+        catch (JSException) { } // storage blocked: secrets just won't persist
+    }
+
+    private async Task FindSecret(string id)
+    {
+        if (!_secrets.Add(id)) return;
+        try { await JS.InvokeVoidAsync("localStorage.setItem", "world-secrets", string.Join(",", _secrets)); }
+        catch (JSException) { }
+        await ShowToast($"{SecretNames[id]} Secrets found: {_secrets.Count}/{SecretNames.Count}");
+    }
+
+    private async Task ShowToast(string message)
+    {
+        var toast = _secretToast = message;
+        StateHasChanged();
+        await Task.Delay(3500);
+        if (_secretToast == toast) { _secretToast = null; StateHasChanged(); }
+    }
+
+    // Welcome card shows once per browser; the mailbox letter holds the contact links.
+    private bool _showWelcome, _showMailbox;
+    private readonly (int X, int Y) _mailbox = (222, 610);
+    private bool NearMailbox => Math.Abs(_playerX - _mailbox.X) < 100 && Math.Abs(_playerY - _mailbox.Y) < 90;
+    private void OpenMailbox() => _showMailbox = true;
+    private void CloseMailbox() => _showMailbox = false;
+
+    private async Task DismissWelcome()
+    {
+        _showWelcome = false;
+        StateHasChanged();
+        try { await JS.InvokeVoidAsync("localStorage.setItem", "world-welcomed", "1"); }
+        catch (JSException) { } // storage blocked: the card just shows again next visit
+    }
+
+    // Seasons follow the visitor's date; ?season=christmas|halloween|thanksgiving|easter|summer|none previews one.
+    [SupplyParameterFromQuery(Name = "season")] public string? SeasonQuery { get; set; }
+    private static readonly string[] Seasons = { "christmas", "halloween", "thanksgiving", "easter", "summer", "none" };
+    private string _season = "none", _weather = "rain";
+
+    protected override void OnInitialized()
+    {
+        var today = DateTime.Today;
+        _season = SeasonQuery?.ToLowerInvariant() is { } requested && Seasons.Contains(requested) ? requested : SeasonFor(today);
+        _weather = _season switch { "christmas" => "snow", "halloween" or "thanksgiving" => "leaves", _ => today.Month is 1 or 2 ? "snow" : "rain" };
+    }
+
+    private static string SeasonFor(DateTime day)
+    {
+        var easter = EasterSunday(day.Year);
+        return day.Month switch
+        {
+            12 => "christmas",
+            10 => "halloween",
+            11 => "thanksgiving",
+            _ when day >= easter.AddDays(-14) && day <= easter.AddDays(1) => "easter",
+            6 or 7 or 8 => "summer",
+            _ => "none"
+        };
+    }
+
+    // Anonymous Gregorian algorithm (checked against 2019, 2024-2027).
+    private static DateTime EasterSunday(int year)
+    {
+        int a = year % 19, b = year / 100, c = year % 100, d = b / 4, e = b % 4, f = (b + 8) / 25, g = (b - f + 1) / 3;
+        int h = (19 * a + b - d - g + 15) % 30, i = c / 4, k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = (a + 11 * h + 22 * l) / 451;
+        return new DateTime(year, (h + l - 7 * m + 114) / 31, (h + l - 7 * m + 114) % 31 + 1);
+    }
+
+    // Easter egg hunt: six eggs hidden around the map while the Easter season is on.
+    private readonly (int X, int Y)[] _eggs = { (160, 300), (520, 300), (930, 420), (240, 880), (880, 1080), (720, 1180) };
+    private readonly HashSet<int> _eggsFound = new();
+
+    private async Task FindEgg(int egg)
+    {
+        if (!_eggsFound.Add(egg)) return;
+        await ShowToast(_eggsFound.Count == _eggs.Length ? "You found every Easter egg!" : $"Easter egg found! {_eggsFound.Count}/{_eggs.Length}");
+    }
+    private bool IsNearby(WorldLocation location) => Math.Sqrt(Math.Pow(_playerX - location.X, 2) + Math.Pow(_playerY - location.Y, 2)) < 135;
+    private void Interact()
+    {
+        if (NearMailbox) OpenMailbox();
+        else if (NearbyLocation is not null) Inspect(NearbyLocation);
+    }
+    private void ReturnHome() { Navigation.NavigateTo("/"); }
+    private void Inspect(WorldLocation location)
+    {
+        ActiveLocation = location;
+        HomeRoom = null;
+        SelectedWorkStation = null;
+        SelectedProject = null;
+        ShowProjectLog = false;
+        ShowTeamPhotos = false;
+        SelectedWorldMemory = MemoriesFor(location.Id).FirstOrDefault();
+    }
+    private void SelectVehicle(string id) => SelectedVehicle = id;
+    private void EnterHomeRoom(string? room) { HomeRoom = room; SelectedVehicle = null; SelectedWorldMemory = room is null ? null : MemoriesFor(room).FirstOrDefault(); }
+    private void SelectWorkStation(WorkStation? station) { SelectedWorkStation = station; SelectedProject = null; ShowProjectLog = false; ShowTeamPhotos = false; }
+    private void ClearWorkStation() => SelectWorkStation(null);
+    private void ToggleProjectLog() { ShowProjectLog = !ShowProjectLog; ShowTeamPhotos = false; SelectedProject = null; }
+    private void ToggleTeamPhotos() { ShowTeamPhotos = !ShowTeamPhotos; ShowProjectLog = false; SelectedProject = null; }
+    private void SelectProject(WorkProject project) => SelectedProject = project;
+    private void SelectWorldMemory(WorldMemory memory) => SelectedWorldMemory = memory;
+    private IEnumerable<WorldMemory> MemoriesFor(string locationId) => _worldMemories.Where(memory => memory.LocationId == locationId);
+
+    // Memory board + selected photo, shared by the memory rooms and the inside of the house.
+    private RenderFragment MemoryWall(string locationId) => @<div class="life-memory-wall">
+        <div class="life-memory-board">
+            <div class="life-board-heading"><span>MEMORY WALL</span><small>Select a memory to look closer.</small></div>
+            <div class="life-memory-cards">
+                @foreach (var memory in MemoriesFor(locationId))
+                {
+                    <button class="life-memory-card @(SelectedWorldMemory?.ImagePath == memory.ImagePath ? "life-memory-selected" : string.Empty)" @onclick="() => SelectWorldMemory(memory)"><img src="@memory.ImagePath" alt="@memory.Alt" /><strong>@memory.Caption</strong></button>
+                }
+            </div>
+        </div>
+        @if (SelectedWorldMemory is not null)
+        {
+            <figure class="life-memory-display"><img src="@SelectedWorldMemory.ImagePath" alt="@SelectedWorldMemory.Alt" /><figcaption><span>MEMORY</span><strong>@SelectedWorldMemory.Caption</strong><small>@SelectedWorldMemory.Description</small></figcaption></figure>
+        }
+    </div>;
+    private ElementReference _screen;
+    private string? _focusedLayer;
+    private string PanelLayer => $"{ActiveLocation?.Id}/{HomeRoom}/{SelectedWorkStation?.Id}/{ShowProjectLog}/{ShowTeamPhotos}/{SelectedProject?.Id}/{_showMailbox}/{_showWelcome}";
+
+    // ESC backs out one layer at a time; only the top layer of a location closes the panel.
+    private void GoBack()
+    {
+        if (SelectedProject is not null) SelectedProject = null;
+        else if (ShowProjectLog) ShowProjectLog = false;
+        else if (ShowTeamPhotos) ShowTeamPhotos = false;
+        else if (SelectedWorkStation is not null) ClearWorkStation();
+        else if (HomeRoom is not null) EnterHomeRoom(null);
+        else ClosePanel();
+    }
+
+    private void ClosePanel() { ActiveLocation = null; HomeRoom = null; SelectedVehicle = null; SelectedWorkStation = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; ShowTeamPhotos = false; }
+    private void ToggleMinimap() => ShowMinimap = !ShowMinimap;
+
+    private sealed record WorldLocation(string Id, string Name, string Category, string Icon, string Subtitle, int X, int Y);
+    private sealed record WorkStation(string Id, string ShortName, string Company, string Title, string Description, string Icon, IReadOnlyList<string> Technologies, IReadOnlyList<WorkProject> Projects);
+    private sealed record WorkProject(string Id, string Title, string Summary, string Detail, string Technologies);
+    private sealed record WorldMemory(string LocationId, string ImagePath, string Alt, string Caption, string Description);
+}
