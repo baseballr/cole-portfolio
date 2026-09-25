@@ -10,6 +10,53 @@
 
     <div class="projects-grid">
         <div class="project-card">
+            <h3>This Portfolio</h3>
+            <p>
+                The site you're on: a Blazor WebAssembly app with Cole's World, a drivable map of my work and life drawn entirely in CSS and SVG. It's the one project I can share the code for.
+            </p>
+
+            <button class="read-more" @onclick='() => Toggle("portfolio")' aria-expanded="@Expanded("portfolio")">
+                <span class="read-more-text">@(_expanded.Contains("portfolio") ? "Show less" : "Read more")</span>
+                <span class="chev" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="project-details-wrapper @(_expanded.Contains("portfolio") ? "expanded" : "")">
+                <div class="project-details">
+                    <div class="detail-step" style="--i:0">
+                        <h4>Problem</h4>
+                        <p>All of my professional work is internal client software I can't show, so I wanted a portfolio that demonstrates how I build things instead of just listing them, and that stands out from template sites.</p>
+                    </div>
+                    <div class="detail-step" style="--i:1">
+                        <h4>Approach</h4>
+                        <p>Built it in C# with Blazor WebAssembly on .NET 8, deployed as a static site to GitHub Pages through a GitHub Actions pipeline on every push. Cole's World is plain CSS and inline SVG with no game engine: seasonal decorations follow the visitor's date (including a calculated Easter), lighting follows their clock, and it drives with the keyboard on desktop or by dragging on phones.</p>
+                    </div>
+                    <div class="detail-step" style="--i:2">
+                        <h4>Tradeoff</h4>
+                        <p>Blazor has a slower first load than a plain JavaScript site, but it let me build the whole thing in the same C# I use every day. Static hosting is free and needs no server, at the cost of a small redirect workaround so deep links like /projects work on GitHub Pages.</p>
+                    </div>
+                    <div class="detail-step" style="--i:3">
+                        <h4>Outcome</h4>
+                        <p>A live site on a custom domain that deploys itself on every push, works on phones and desktops, and gives people something to remember me by.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-links">
+                <a href="/colesworld" class="link">Explore Cole's World →</a>
+                <a href="https://github.com/baseballr/cole-portfolio" target="_blank" rel="noopener noreferrer" class="link">View source →</a>
+            </div>
+
+            <div class="tags">
+                <span class="tag">C#</span>
+                <span class="tag">.NET</span>
+                <span class="tag">Blazor</span>
+                <span class="tag">CSS</span>
+                <span class="tag">SVG</span>
+                <span class="tag">GitHub Actions</span>
+            </div>
+        </div>
+
+        <div class="project-card">
             <h3>FLDCF Wizards</h3>
             <p>
                 Built a data comparison tool that lets FLDCF employees easily manage applications for Medicaid, SNAP, and TANF — supporting millions of state assistance applications every year.

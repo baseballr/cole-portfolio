@@ -500,6 +500,13 @@ html, body {
     margin-top: 0.8rem; /* give some breathing room from content */
 }
 
+.project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
 .link {
     color: var(--accent);
     font-size: 0.9rem;
