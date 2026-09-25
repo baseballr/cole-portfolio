@@ -62,6 +62,17 @@
     <script src="js/theme.js"></script>
     <script src="js/scrollReveal.js"></script>
     <script src="js/worldScale.js"></script>
+    <!-- GoatCounter analytics (skips localhost by default). Blazor changes pages with
+         history.pushState instead of reloading, so each in-app navigation is counted too. -->
+    <script>
+        (function (push) {
+            history.pushState = function () {
+                push.apply(this, arguments);
+                if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: location.pathname + location.search });
+            };
+        })(history.pushState);
+    </script>
+    <script data-goatcounter="https://colespitzer.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
