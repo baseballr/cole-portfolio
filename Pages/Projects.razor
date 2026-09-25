@@ -25,7 +25,7 @@
         <div class="project-card">
             <h3>Datamart</h3>
             <p>
-                I built a batch job that would grab data from an Oracle DB and then ingest it into Excel files daily. This was used as a source of truth while we were migrating to a new system, and it was used by multiple teams to validate their work against the old system.
+                I built a batch job that would grab data from an Oracle DB, write it into Excel files, and deliver them over SFTP daily. This was used as a source of truth while we were migrating to a new system, and it was used by multiple teams to validate their work against the old system.
             </p>
 
             <button class="read-more" @onclick='() => Toggle("datamart")' aria-expanded="@Expanded("datamart")">
@@ -49,7 +49,7 @@
                     </div>
                     <div class="detail-step" style="--i:3">
                         <h4>Outcome</h4>
-                        <p>A daily pipeline that ingests and aggregates 108M+ rows and writes complete SFTP output in under 8 minutes, giving FLDCF a transparent, self-service way to validate the data instead of relying on trust in the pipeline.</p>
+                        <p>A daily pipeline that ingests and aggregates 108M+ rows, writes the Excel workbooks, and delivers them over SFTP in under 8 minutes, giving FLDCF a transparent, self-service way to validate the data instead of relying on trust in the pipeline.</p>
                     </div>
                 </div>
             </div>
@@ -110,12 +110,13 @@
                 Conceptualized and developed a monthly compliance survey sent to over 6,000 teammates to keep the company aligned with legal standards. Built while at Brown &amp; Brown.
             </p>
             <div class="tags">
+                <span class="tag">Azure Functions</span>
                 <span class="tag">Azure Logic Apps</span>
                 <span class="tag">C#</span>
                 <span class="tag">.NET</span>
                 <span class="tag">Power BI</span>
                 <span class="tag">Azure Data Factory</span>
-                <span class="tag">SurveyMonkey</span>
+                <span class="tag">SurveyJS</span>
             </div>
         </div>
 
