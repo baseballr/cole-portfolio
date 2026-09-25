@@ -1,11 +1,12 @@
 @page "/colesworld"
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageTitle>Cole's World</PageTitle>
 
-<section class="world-screen" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
+<section @ref="_screen" class="world-screen world-@_timeOfDay" tabindex="0" autofocus="autofocus" @onkeydown="HandleKeyDown" @onkeyup="HandleKeyUp" @onkeydown:preventDefault="true">
     <div class="world-hud">
-        <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span></div>
+        <div class="world-brand"><span class="world-brand-mark">C</span><span>COLE'S WORLD</span>@if (_secrets.Count > 0) { <span class="secret-count" title="Secrets found">★ @_secrets.Count/@SecretNames.Count</span> }</div>
         <button class="vehicle-switch" @onclick="SwitchVehicle" title="Switch vehicle (V)"><span>@Vehicle.Icon</span> @Vehicle.Name <b>⇄</b></button>
     </div>
 
@@ -22,12 +23,76 @@
             <div class="world-road road-camp"></div>
             @foreach (var connection in _roadConnections)
             {
-                <span class="world-road-connection" style="left:@($"{connection.X}px"); top:@($"{connection.Y}px")"></span>
+                <span class="world-road-connection @(connection.Y < 700 ? "connection-up" : "connection-down")" style="left:@($"{connection.X}px"); top:@($"{connection.Y}px")"></span>
             }
-            <svg class="world-river" viewBox="0 0 1500 1500" aria-hidden="true"><path d="M1330 320 C1340 420 1440 470 1425 560 S1395 800 1435 900 S1415 1000 1395 1070" /></svg>
-            <div class="world-water water-one"></div>
+            <div class="world-bridge" aria-hidden="true"></div>
+            <svg class="world-river" viewBox="0 0 1500 1500" aria-hidden="true"><path d="@RiverPath" /><path class="river-flow" d="@RiverPath" /></svg>
+            <div class="world-water water-one"><i class="pond-fish"></i><i class="pond-fish pond-fish-two"></i></div>
             <div class="world-mountain mountain-one"></div>
             <div class="world-mountain mountain-two"></div>
+            <div class="world-yeti-spot" aria-hidden="true"><span class="world-yeti" @onclick='() => FindSecret("yeti")'></span></div>
+            <div class="world-bear-spot" aria-hidden="true"><span class="world-bear" @onclick='() => FindSecret("bear")'></span></div>
+            <i class="river-fish" aria-hidden="true"></i>
+            <div class="critter critter-dog @(DogExcited ? "critter-dog-excited" : string.Empty)" @onclick="PetDog" style="left:@($"{_dog.X}px"); top:@($"{_dog.Y}px")" aria-hidden="true">
+                <svg viewBox="0 0 60 50">
+                    <ellipse cx="32" cy="47" rx="22" ry="3" fill="rgba(30, 86, 71, 0.3)" />
+                    <path class="dog-tail" d="M44 40 Q54 38 56 28" fill="none" stroke="#d9a456" stroke-width="5" stroke-linecap="round" />
+                    <ellipse cx="39" cy="37" rx="12" ry="11" fill="#e3b56c" />
+                    <ellipse cx="42" cy="46" rx="7" ry="2.8" fill="#d9a456" />
+                    <ellipse cx="27" cy="31" rx="9" ry="13" fill="#e3b56c" />
+                    <ellipse cx="24" cy="33" rx="5" ry="8" fill="#f3d59a" />
+                    <rect x="27" y="36" width="5" height="11" rx="2.5" fill="#d9a456" />
+                    <rect x="20" y="36" width="5" height="11" rx="2.5" fill="#e8bd74" />
+                    <path d="M20 25 q7 4 13 0" fill="none" stroke="#d35f46" stroke-width="3" stroke-linecap="round" />
+                    <circle cx="26" cy="29" r="1.6" fill="#f5d58f" />
+                    <circle cx="25" cy="17" r="9" fill="#e8bd74" />
+                    <ellipse class="dog-tongue" cx="17" cy="24" rx="2" ry="2.6" fill="#e56b6f" />
+                    <ellipse cx="17.5" cy="20" rx="6.5" ry="4.5" fill="#f3d59a" />
+                    <circle cx="12" cy="19" r="2" fill="#2a1d15" />
+                    <circle cx="21.5" cy="15" r="1.4" fill="#2a1d15" />
+                    <path d="M28 10 q7 1 5 12 q-4 1 -6 -4 z" fill="#c98f45" />
+                </svg>
+                <span class="dog-heart">♥</span>
+                @if (_honking) { <span class="speech">Woof!</span> }
+            </div>
+            <div class="critter critter-fishers" style="left:@($"{_fishers.X}px"); top:@($"{_fishers.Y}px")" aria-hidden="true">
+                <svg viewBox="0 0 120 80">
+                    <ellipse cx="34" cy="74" rx="26" ry="3.5" fill="rgba(30, 86, 71, 0.3)" />
+                    <rect x="15" y="52" width="5.5" height="21" rx="2" fill="#4a6f96" /><rect x="22" y="52" width="5.5" height="21" rx="2" fill="#4a6f96" />
+                    <rect x="13" y="33" width="16" height="22" rx="5" fill="#3a4f55" />
+                    <circle cx="21" cy="27" r="6.5" fill="#eab48c" />
+                    <ellipse cx="23.5" cy="31" rx="4.5" ry="4" fill="#9a6440" />
+                    <rect x="22" y="24" width="5" height="2.2" rx="1" fill="#d35f46" />
+                    <rect x="15.5" y="15" width="11" height="7.5" rx="3" fill="#e8d5a8" /><ellipse cx="21" cy="22.5" rx="11" ry="2.3" fill="#d9c28e" />
+                    <path d="M24 38 L33 45" stroke="#3a4f55" stroke-width="4.5" stroke-linecap="round" /><circle cx="34" cy="46" r="2.2" fill="#eab48c" />
+                    <rect x="41" y="62" width="4" height="11" rx="1.5" fill="#eab48c" /><rect x="46.5" y="62" width="4" height="11" rx="1.5" fill="#eab48c" />
+                    <rect x="40" y="58" width="11.5" height="6" rx="2" fill="#4a6f96" />
+                    <rect x="40" y="46" width="11.5" height="14" rx="4" fill="#f5c976" />
+                    <circle cx="46" cy="41" r="5.2" fill="#eab48c" />
+                    <path d="M40.8 40 a5.2 5.2 0 0 1 10.4 0 z" fill="#d35f46" /><rect x="49" y="38.6" width="5" height="1.6" rx="0.8" fill="#b94c38" />
+                    <circle cx="48.6" cy="41.5" r="0.8" fill="#2a1d15" />
+                    <path d="M47 50 L52 56" stroke="#f5c976" stroke-width="3.5" stroke-linecap="round" /><circle cx="52.5" cy="57" r="1.8" fill="#eab48c" />
+                    <g class="angler angler-dad">
+                        <ellipse class="splash" cx="86" cy="63" rx="5" ry="1.8" fill="none" stroke="#fff" stroke-width="1.2" />
+                        <g class="rod">
+                            <line x1="34" y1="46" x2="84" y2="12" stroke="#5a3a24" stroke-width="1.8" stroke-linecap="round" />
+                            <line x1="84" y1="12" x2="86" y2="62" stroke="rgba(255, 255, 255, 0.75)" stroke-width="0.7" />
+                            <g class="bobber"><circle cx="86" cy="62" r="2.3" fill="#fff" /><path d="M83.7 62 a2.3 2.3 0 0 1 4.6 0 z" fill="#d35f46" /></g>
+                            <g class="catch"><ellipse cx="86" cy="67" rx="2.8" ry="5.5" fill="#f59b54" /><path d="M86 71.5 l-3.5 4 h7 z" fill="#e36d3d" /><circle cx="85" cy="64.5" r="0.7" fill="#2a1d15" /></g>
+                        </g>
+                    </g>
+                    <g class="angler angler-boy">
+                        <ellipse class="splash" cx="102" cy="69" rx="5" ry="1.8" fill="none" stroke="#fff" stroke-width="1.2" />
+                        <g class="rod">
+                            <line x1="52" y1="57" x2="100" y2="32" stroke="#5a3a24" stroke-width="1.5" stroke-linecap="round" />
+                            <line x1="100" y1="32" x2="102" y2="68" stroke="rgba(255, 255, 255, 0.75)" stroke-width="0.7" />
+                            <g class="bobber"><circle cx="102" cy="68" r="2.3" fill="#fff" /><path d="M99.7 68 a2.3 2.3 0 0 1 4.6 0 z" fill="#d35f46" /></g>
+                            <g class="catch"><ellipse cx="102" cy="73" rx="2.8" ry="5.5" fill="#f59b54" /><path d="M102 77.5 l-3.5 4 h7 z" fill="#e36d3d" /><circle cx="101" cy="70.5" r="0.7" fill="#2a1d15" /></g>
+                        </g>
+                    </g>
+                </svg>
+                @if (_honking) { <span class="speech speech-fishers">Shh! The fish!</span> }
+            </div>
 
             @foreach (var item in _scenery)
             {
@@ -40,6 +105,20 @@
                     <span class="location-building location-building-@location.Id">@location.Icon</span>
                     <span class="location-name">@location.Name</span>
                 </button>
+            }
+
+            <div class="world-shade"></div>
+            @foreach (var (x, y) in _fireflies)
+            {
+                <i class="firefly" style="left:@($"{x}px"); top:@($"{y}px")"></i>
+            }
+            @foreach (var puff in _dust)
+            {
+                <i @key="puff.Id" class="dust-puff" style="left:@($"{puff.X}px"); top:@($"{puff.Y}px")"></i>
+            }
+            @if (_honking)
+            {
+                <span class="speech speech-honk" style="left:@($"{_playerX}px"); top:@($"{_playerY}px")">HONK!</span>
             }
 
             <div class="world-truck world-truck-@Vehicle.Id" style="@TruckStyle" aria-label="Your @Vehicle.Name" @onpointerdown="StartDrag" @onpointermove="Drag" @onpointerup="StopDrag" @onpointercancel="StopDrag">
@@ -80,7 +159,7 @@
                         <div class="cubicle-inside">
                             <button class="inside-back" @onclick="ClearWorkStation">← OFFICE FLOOR</button>
                             <div class="cubicle-window"><span>NOW ENTERING</span><strong>@SelectedWorkStation.Company</strong><small>@SelectedWorkStation.Title</small></div>
-                            <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@ShowProjectLog"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div></div>
+                            <div class="inside-desk"><button class="inside-monitor" @onclick="ToggleProjectLog" aria-pressed="@ShowProjectLog"><span>@SelectedWorkStation.Icon</span><small>PROJECT LOG</small></button><div class="inside-keyboard"></div>@if (MemoriesFor(SelectedWorkStation.Id).FirstOrDefault() is { } framed) { <button class="inside-photo-frame" @onclick="ToggleTeamPhotos" aria-pressed="@ShowTeamPhotos"><img src="@framed.ImagePath" alt="" /><small>TEAM PHOTOS</small></button> }</div>
                             @if (ShowProjectLog)
                             {
                                 <div class="project-log-desk">
@@ -98,6 +177,15 @@
                                 {
                                     <article class="project-monitor-detail"><div class="monitor-detail-bar"><span></span><span></span><span></span><small>PROJECT LOG // @SelectedWorkStation.ShortName</small></div><div class="monitor-detail-screen"><span class="panel-category">PROJECT DETAIL</span><h2>@SelectedProject.Title</h2><p>@SelectedProject.Detail</p><span class="paper-tech">@SelectedProject.Technologies</span></div></article>
                                 }
+                            }
+                            else if (ShowTeamPhotos)
+                            {
+                                <div class="garage-pegboard cubicle-pegboard">
+                                    @foreach (var memory in MemoriesFor(SelectedWorkStation.Id))
+                                    {
+                                        <figure class="pinned-photo"><span class="paper-pin"></span><img src="@memory.ImagePath" alt="@memory.Alt" /><figcaption><strong>@memory.Caption</strong><small>@memory.Description</small></figcaption></figure>
+                                    }
+                                </div>
                             }
                             else
                             {
@@ -179,23 +267,39 @@
     @if (ShowMinimap)
     {
         <div class="world-minimap" @onclick:stopPropagation="true">
-            <div class="minimap-title">MINIMAP <button @onclick="ToggleMinimap" aria-label="Close minimap">×</button></div>
-            <div class="minimap-world">
-                <span class="minimap-road minimap-road-main"></span>
-                <span class="minimap-road minimap-road-home"></span>
-                <span class="minimap-road minimap-road-work"></span>
-                <span class="minimap-road minimap-road-ski"></span>
-                <span class="minimap-road minimap-road-church"></span>
-                <span class="minimap-road minimap-road-golf"></span>
-                <span class="minimap-road minimap-road-camp"></span>
-                <span class="minimap-road minimap-road-fishing"></span>
+            <div class="minimap-title">MAP <button @onclick="ToggleMinimap" aria-label="Close map">×</button></div>
+            <svg class="minimap-map" viewBox="0 0 1500 1500" role="img" aria-label="Map of Cole's World">
+                <rect width="1500" height="1500" fill="#79b99d" />
+                <polygon points="890,290 1130,-20 1370,290" fill="#6f9a8c" /><polygon points="1072,54 1130,-20 1188,54" fill="#f2ead0" />
+                <polygon points="1120,330 1310,120 1500,330" fill="#587f73" /><polygon points="1264,170 1310,120 1356,170" fill="#f2ead0" />
+                <path d="@RiverPath" fill="none" stroke="#5facc0" stroke-width="44" stroke-linecap="round" />
+                <ellipse cx="1350" cy="1165" rx="220" ry="155" transform="rotate(-12 1350 1165)" fill="#5facc0" stroke="#e9dcb5" stroke-width="16" />
+                @foreach (var tree in _scenery.Where(item => item.Kind is "oak" or "pine"))
+                {
+                    <circle cx="@tree.X" cy="@(tree.Y - 20)" r="18" fill="@(tree.Kind == "pine" ? "#225d4b" : "#2f806a")" />
+                }
+                @foreach (var road in _mapRoads)
+                {
+                    <rect x="@road.X" y="@road.Y" width="@road.W" height="@road.H" fill="#e9dcb5" stroke="#e9dcb5" stroke-width="28" />
+                }
+                @foreach (var road in _mapRoads)
+                {
+                    <rect x="@road.X" y="@road.Y" width="@road.W" height="@road.H" fill="#56635f" />
+                }
+                <line x1="0" y1="706" x2="1500" y2="706" stroke="#fff0bc" stroke-width="8" stroke-dasharray="50 40" />
+                <rect x="1378" y="650" width="64" height="112" fill="#a87450" />
                 @foreach (var location in _locations)
                 {
-                    <span class="minimap-location" style="left:@($"{location.X / 15}px"); top:@($"{location.Y / 15}px")">@location.Icon</span>
+                    <g class="mm-place mm-place-@location.Id @(IsNearby(location) ? "mm-place-near" : string.Empty)">
+                        <circle cx="@location.X" cy="@location.Y" r="48" />
+                        <text x="@location.X" y="@(location.Y - 72)">@(location.Id switch { "work" => "Work", "fishing" => "Dock", _ => location.Name })</text>
+                        <title>@location.Name</title>
+                    </g>
                 }
-                <span class="minimap-player" style="left:@($"{_playerX / 15}px"); top:@($"{_playerY / 15}px")"></span>
-            </div>
-            <p>Drive to discover places</p>
+                <circle class="mm-player-ring" cx="@_playerX" cy="@_playerY" r="44" />
+                <circle class="mm-player" cx="@_playerX" cy="@_playerY" r="34" />
+            </svg>
+            <p>@(NearbyLocation is { } near ? $"Near {near.Name}" : "Drive to discover places")</p>
         </div>
     }
 
@@ -204,8 +308,12 @@
         <button class="interact-prompt" @onclick="Interact"><span class="prompt-keys"><span>↵</span> PRESS <strong>E</strong> TO ENTER</span><span class="prompt-touch">TAP TO ENTER</span> @NearbyLocation.Name</button>
     }
 
+    @if (_secretToast is not null)
+    {
+        <div class="secret-toast" role="status">@_secretToast</div>
+    }
 
-    <div class="world-controls"><span data-short="WASD  DRIVE" data-touch="DRAG TO DRIVE"><b>WASD</b> / <b>ARROWS</b> Drive</span><button @onclick="Interact" data-short="E  ENTER" data-touch="ENTER"><b>E</b> Interact</button><button @onclick="ToggleMinimap" data-short="M  MAP" data-touch="MAP"><b>M</b> Map</button><button @onclick="ClosePanel" data-short="ESC  CLOSE" data-touch="CLOSE"><b>ESC</b> Close</button><button @onclick="ReturnHome" data-short="R  HOME" data-touch="HOME"><b>R</b> Return to home page</button></div>
+    <div class="world-controls"><span data-short="WASD  DRIVE" data-touch="DRAG TO DRIVE"><b>WASD</b> / <b>ARROWS</b> Drive</span><button @onclick="Interact" data-short="E  ENTER" data-touch="ENTER"><b>E</b> Interact</button><button @onclick="ToggleMinimap" data-short="M  MAP" data-touch="MAP"><b>M</b> Map</button><button @onclick="Honk" data-short="H  HONK" data-touch="HONK"><b>H</b> Honk</button><button @onclick="ClosePanel" data-short="ESC  CLOSE" data-touch="CLOSE"><b>ESC</b> Close</button><button @onclick="ReturnHome" data-short="R  HOME" data-touch="HOME"><b>R</b> Return to home page</button></div>
 </section>
 
 @code {
@@ -220,6 +328,7 @@
     private WorldMemory? SelectedWorldMemory { get; set; }
     private WorkProject? SelectedProject { get; set; }
     private bool ShowProjectLog { get; set; }
+    private bool ShowTeamPhotos { get; set; }
     private double _truckAngle;
     private bool _truckFacingLeft;
     private readonly HashSet<string> _pressedKeys = new();
@@ -246,20 +355,31 @@
     private readonly WorldMemory[] _worldMemories =
     {
         new("fishing", "images/world/DogBeach.jpg", "Cole outdoors", "Dog Beach", "A quiet day outside, with time to slow down and enjoy being away from a screen."),
+        new("fishing", "images/world/BennyBeach.jpeg", "Cole holding a baby at the beach", "Beach day with Benny", "Soaking up the sun and the waves with little Benny."),
         new("fishing", "images/world/Cruise.JPG", "Cole on a catamaran", "Cruise Time!", "A day out on the water, enjoying the scenery and the ride."),
+        new("fishing", "images/world/Kayak.jpg", "Cole kayaking at night", "Night paddle", "Out on the kayak after dark, when the water goes still."),
         
         new("camp", ImagePath: "images/world/IMG_1357.jpg", "Cole on an outdoor adventure", "Camp life", "Hammock camping, open air, and a little distance from the usual routine."),
         new("camp", ImagePath: "images/world/Acadia.JPG", "Cole on a hike", "Acadia National park", "Exploring the trails and enjoying the natural beauty of Acadia National Park."),
+        new("camp", "images/world/Fourwheeling.JPG", "Cole on an ATV", "Four-wheeling", "Kicking up dirt on the four-wheelers."),
         
         new("church", "images/world/GraysonConfirmation.jpg", "", "Community and service", "The confirmation into the church of one of my students!"),
+        new("church", "images/world/Universal.jpg", "Cole with the youth group at Universal Studios", "Youth trip to Universal", "Taking the youth group to Universal for a night of rides and fun."),
+        new("church", "images/world/BusDriver.jpg", "Cole driving the youth group bus", "Bus driver duty", "Driving the youth group on a trip; everyone else got a nap."),
         new("church", "images/world/DirtBikeGrayson.jpg", "Cole with confirman", "Celebration", "Celebrating confirmation with my confirmee Grayson."),
        
         new("golf", "images/world/NolesGame.jpg", "Cole at FSU", "Sports and competition", "A few favorite teams, and enjoying time with family."),
         new("golf", "images/world/DiskGolf.jpeg", "Cole Disk Golfing", "Freindly competition with friends", "If your not first your last!"),
         new("golf", "images/world/GatorGame.jpeg", "Cole at brothers bachelor party", "House Divided", "Gator game for my brothers bachelor party."),
         
+        new("brown", "images/world/BrownTeam.jpg", "Cole with his Brown & Brown teammates in matching holiday shirts", "The team", "Matching shirts and all at the Brown & Brown holiday party."),
+        new("brown", "images/world/HippieHolidays.jpg", "Cole and teammates at the Hippie Holidays party", "Hippie Holidays", "Groovy and bright with the team at the holiday party."),
+        new("brown", "images/world/PeaceSanta.jpg", "Cole posing with Santa at the holiday party", "Peace, love & Santa", "Even Santa showed up to the Hippie Holidays party."),
+        new("brown", "images/world/BrownRooftop.jpg", "Cole with his former Brown & Brown manager on a rooftop overlooking the water", "With my old boss", "Taking in the view with my former manager at Brown & Brown."),
+        new("brown", "images/world/BrownHalloween.jpg", "Cole and teammates in Halloween costumes at the office", "Office Halloween", "Costume day with the team at Brown & Brown."),
         new("house", "images/world/House.jpg", "Cole in front of his first home", "My first home", "Bought my first home in 2025."),
         new("house", "images/world/Proposal.JPEG", "Cole proposing to his fiancée", "The proposal", "The day I asked my fiancée to marry me."),
+        new("house", "images/world/JulieWedding.jpg", "Cole with the bride at a friend's wedding", "Julie's wedding", "Celebrating my friend Julie on her big day."),
         
         new("bronco", "images/world/Bronco.jpg", "Cole driving his Bronco on an off-road trail", "2022 Ford Bronco", "Used for exploring, camping, hauling stuff, and generally getting into trouble."),
         new("f150", "images/world/F150.jpg", "Cole's Ford F-150", "Ford F-150", ""),
@@ -267,6 +387,8 @@
         new("dirtbike", "images/world/DirtbikeHump.jpg", "Cole racing his dirt bike", "Race day", "Aiming for first and tons of laughs."),
         
         new("ski", "images/world/Skiing.jpg", "Cole on an adventure", "Skiing new terrain", "Intermediate skier, mostly East Coast, always looking for the next mountain."),
+        new("ski", "images/world/HikingSeneca.jpg", "Cole at a mountain overlook", "Mountain views", "Hiking up to the overlook for a view of the ridgelines."),
+        new("ski", "images/world/ToyStory.jpg", "Cole and friends dressed as Toy Story characters in the snow", "To infinity and beyond", "Suiting up as the Toy Story crew for a day in the snow."),
     };
 
     // Decorative map scenery, anchored at its base (X, Y). Kinds: oak, pine, bush, flowers, rock, reeds.
@@ -295,7 +417,7 @@
 
     private readonly (string Id, string Name, string Icon)[] _garageVehicles =
     {
-        ("bronco", "2022 Ford Bronco", "🚙"), ("f150", "Ford F-150", "🛻"), ("dirtbike", "2018 Honda CRF450R", "🏍")
+        ("bronco", "Ford Bronco", "🚙"), ("f150", "Ford F-150", "🛻"), ("dirtbike", "Dirtbike", "🏍")
     };
 
     private readonly List<WorldLocation> _locations = new()
@@ -321,10 +443,12 @@
     {
         var key = args.Key.ToLowerInvariant();
         if (key == "m") { ToggleMinimap(); return; }
-        if (key == "escape") { ClosePanel(); return; }
+        if (key == "escape") { GoBack(); return; }
         if (key == "e") { Interact(); return; }
         if (key == "r") { ReturnHome(); return; }
         if (key == "v") { SwitchVehicle(); return; }
+        if (key == "h") { _ = Honk(); return; }
+        if (key == "n") { CycleTimeOfDay(); return; }
         if (key is "arrowup" or "w" or "arrowdown" or "s" or "arrowleft" or "a" or "arrowright" or "d")
         {
             _pressedKeys.Add(key);
@@ -399,11 +523,97 @@
         }
         var nextX = Math.Clamp(_playerX + x, 40, WorldSize - 40);
         var nextY = Math.Clamp(_playerY + y, 40, WorldSize - 40);
-        if (!HitsBuilding(nextX, nextY)) { _playerX = nextX; _playerY = nextY; }
+        if (!IsBlocked(nextX, nextY)) { KickUpDust(); _playerX = nextX; _playerY = nextY; }
         ActiveLocation = null;
     }
 
-    private bool HitsBuilding(int x, int y) => _locations.Any(location => x > location.X - 90 && x < location.X + 90 && y > location.Y - 70 && y < location.Y + 70);
+    // Map characters: the dog sits by the home road, dad and son fish from the pond's west bank. Positions are each drawing's center.
+    private readonly (int X, int Y) _dog = (415, 475), _fishers = (1123, 1185);
+
+    // Shared by the river, its flow overlay and the minimap. Road rects mirror the .world-road CSS (main road + side roads).
+    private const string RiverPath = "M1330 320 C1340 420 1440 470 1425 560 S1395 800 1435 900 S1415 1000 1395 1070";
+    private readonly (int X, int Y, int W, int H)[] _mapRoads =
+    {
+        (0, 650, 1500, 112), (257, 440, 86, 250), (777, 350, 86, 340), (1067, 215, 86, 475),
+        (1067, 690, 86, 235), (607, 690, 86, 136), (387, 690, 86, 413), (1237, 690, 86, 458)
+    };
+    private bool IsBlocked(int x, int y) =>
+        _locations.Any(location => x > location.X - 90 && x < location.X + 90 && y > location.Y - 70 && y < location.Y + 70)
+        || new[] { _dog, _fishers }.Any(critter => Math.Abs(x - critter.X) < 70 && Math.Abs(y - critter.Y) < 55);
+
+    // The dog perks up when the truck pulls in close (just outside her no-drive zone) or when she's clicked.
+    private bool DogExcited => _dogPetted || (Math.Abs(_playerX - _dog.X) < 160 && Math.Abs(_playerY - _dog.Y) < 130);
+    private bool _dogPetted, _honking;
+
+    private async Task PetDog()
+    {
+        _dogPetted = true;
+        _ = FindSecret("dog");
+        await Task.Delay(1500);
+        _dogPetted = false;
+    }
+
+    // H honks: the dog barks and the fishermen complain until the bubbles fade.
+    private async Task Honk()
+    {
+        if (_honking) return;
+        _honking = true;
+        StateHasChanged();
+        await Task.Delay(1600);
+        _honking = false;
+        StateHasChanged();
+    }
+
+    // Time of day follows the visitor's clock (WebAssembly uses the browser's time zone); N cycles it.
+    private static readonly string[] TimesOfDay = { "day", "dusk", "night" };
+    private string _timeOfDay = DateTime.Now.Hour switch { >= 8 and < 18 => "day", (>= 6 and < 8) or (>= 18 and < 20) => "dusk", _ => "night" };
+    private void CycleTimeOfDay() => _timeOfDay = TimesOfDay[(Array.IndexOf(TimesOfDay, _timeOfDay) + 1) % TimesOfDay.Length];
+    private readonly (int X, int Y)[] _fireflies = { (1000, 1010), (1190, 960), (900, 1140), (560, 960), (250, 1250), (1290, 860), (700, 1310), (1050, 1360), (150, 700), (620, 520) };
+
+    // Dust: a puff at the truck's old spot every other step; only the last few stay mounted while their CSS fade plays.
+    private readonly Queue<(int Id, int X, int Y)> _dust = new();
+    private int _dustId;
+    private void KickUpDust()
+    {
+        if (++_dustId % 2 != 0) return;
+        _dust.Enqueue((_dustId, _playerX, _playerY));
+        if (_dust.Count > 6) _dust.Dequeue();
+    }
+
+    // Easter eggs: click the yeti or bear while they're showing, or pet the dog. Found secrets persist in localStorage.
+    private static readonly Dictionary<string, string> SecretNames = new() { ["yeti"] = "Yeti spotted!", ["bear"] = "Bear spotted!", ["dog"] = "You pet the dog!" };
+    private readonly HashSet<string> _secrets = new();
+    private string? _secretToast;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Moving between panel layers usually removes the button that was clicked, which drops focus to <body>
+        // and the section stops hearing keys (ESC, WASD). Pull focus back whenever the layer changes.
+        if (PanelLayer != _focusedLayer)
+        {
+            _focusedLayer = PanelLayer;
+            await _screen.FocusAsync(preventScroll: true);
+        }
+        if (!firstRender) return;
+        try
+        {
+            var saved = await JS.InvokeAsync<string?>("localStorage.getItem", "world-secrets");
+            _secrets.UnionWith((saved ?? "").Split(',').Where(SecretNames.ContainsKey));
+            if (_secrets.Count > 0) StateHasChanged();
+        }
+        catch (JSException) { } // storage blocked: secrets just won't persist
+    }
+
+    private async Task FindSecret(string id)
+    {
+        if (!_secrets.Add(id)) return;
+        var toast = _secretToast = $"{SecretNames[id]} Secrets found: {_secrets.Count}/{SecretNames.Count}";
+        StateHasChanged();
+        try { await JS.InvokeVoidAsync("localStorage.setItem", "world-secrets", string.Join(",", _secrets)); }
+        catch (JSException) { }
+        await Task.Delay(3500);
+        if (_secretToast == toast) { _secretToast = null; StateHasChanged(); }
+    }
     private bool IsNearby(WorldLocation location) => Math.Sqrt(Math.Pow(_playerX - location.X, 2) + Math.Pow(_playerY - location.Y, 2)) < 135;
     private void Interact() { if (NearbyLocation is not null) Inspect(NearbyLocation); }
     private void ReturnHome() { Navigation.NavigateTo("/"); }
@@ -414,13 +624,15 @@
         SelectedWorkStation = null;
         SelectedProject = null;
         ShowProjectLog = false;
+        ShowTeamPhotos = false;
         SelectedWorldMemory = MemoriesFor(location.Id).FirstOrDefault();
     }
     private void SelectVehicle(string id) => SelectedVehicle = id;
     private void EnterHomeRoom(string? room) { HomeRoom = room; SelectedVehicle = null; SelectedWorldMemory = room is null ? null : MemoriesFor(room).FirstOrDefault(); }
-    private void SelectWorkStation(WorkStation? station) { SelectedWorkStation = station; SelectedProject = null; ShowProjectLog = false; }
+    private void SelectWorkStation(WorkStation? station) { SelectedWorkStation = station; SelectedProject = null; ShowProjectLog = false; ShowTeamPhotos = false; }
     private void ClearWorkStation() => SelectWorkStation(null);
-    private void ToggleProjectLog() { ShowProjectLog = !ShowProjectLog; SelectedProject = null; }
+    private void ToggleProjectLog() { ShowProjectLog = !ShowProjectLog; ShowTeamPhotos = false; SelectedProject = null; }
+    private void ToggleTeamPhotos() { ShowTeamPhotos = !ShowTeamPhotos; ShowProjectLog = false; SelectedProject = null; }
     private void SelectProject(WorkProject project) => SelectedProject = project;
     private void SelectWorldMemory(WorldMemory memory) => SelectedWorldMemory = memory;
     private IEnumerable<WorldMemory> MemoriesFor(string locationId) => _worldMemories.Where(memory => memory.LocationId == locationId);
@@ -441,7 +653,22 @@
             <figure class="life-memory-display"><img src="@SelectedWorldMemory.ImagePath" alt="@SelectedWorldMemory.Alt" /><figcaption><span>MEMORY</span><strong>@SelectedWorldMemory.Caption</strong><small>@SelectedWorldMemory.Description</small></figcaption></figure>
         }
     </div>;
-    private void ClosePanel() { ActiveLocation = null; HomeRoom = null; SelectedVehicle = null; SelectedWorkStation = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; }
+    private ElementReference _screen;
+    private string? _focusedLayer;
+    private string PanelLayer => $"{ActiveLocation?.Id}/{HomeRoom}/{SelectedWorkStation?.Id}/{ShowProjectLog}/{ShowTeamPhotos}/{SelectedProject?.Id}";
+
+    // ESC backs out one layer at a time; only the top layer of a location closes the panel.
+    private void GoBack()
+    {
+        if (SelectedProject is not null) SelectedProject = null;
+        else if (ShowProjectLog) ShowProjectLog = false;
+        else if (ShowTeamPhotos) ShowTeamPhotos = false;
+        else if (SelectedWorkStation is not null) ClearWorkStation();
+        else if (HomeRoom is not null) EnterHomeRoom(null);
+        else ClosePanel();
+    }
+
+    private void ClosePanel() { ActiveLocation = null; HomeRoom = null; SelectedVehicle = null; SelectedWorkStation = null; SelectedWorldMemory = null; SelectedProject = null; ShowProjectLog = false; ShowTeamPhotos = false; }
     private void ToggleMinimap() => ShowMinimap = !ShowMinimap;
 
     private sealed record WorldLocation(string Id, string Name, string Category, string Icon, string Subtitle, int X, int Y);
