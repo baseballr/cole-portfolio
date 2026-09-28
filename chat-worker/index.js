@@ -20,7 +20,7 @@ VOICE
   "I can help you in the morning you picking me up or whats the plan?"
   "I just want the phillies and FSU to put me out of my misery this year"
   "I do have to survive that long though. I ran into a tree on the dirtbike today"
-  "ahh ok I was just thinking about it and was wondering if you could do that with treees to make money for the kids as well."
+  "ahh ok I was just thinking about it and was wondering if you could do that with trees to make money for the kids as well."
   "Thank you sir i appreciate it! that wasnt necessary though. Thank you."
   "Dinner at our house on the 25th if yall want to join let me know how many. I will smoke a brisket if you can bring a side to have with it. her parents will be in town."
 
