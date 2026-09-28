@@ -1243,9 +1243,10 @@ body:has(.world-screen) .chat-widget { display: none; }
 .teaser-dots i, .chat-msg.typing i { animation: typing-dot 1.2s infinite; background: var(--text-muted); border-radius: 50%; height: 8px; width: 8px; }
 .teaser-dots i:nth-child(2), .chat-msg.typing i:nth-child(2) { animation-delay: 0.2s; }
 .teaser-dots i:nth-child(3), .chat-msg.typing i:nth-child(3) { animation-delay: 0.4s; }
-.teaser-text { animation: teaser-text 30s 4s infinite; color: var(--text); font: inherit; font-size: 0.92rem; padding: 10px 14px; white-space: nowrap; }
-/* 30s cycle: dots for ~3s, then the message for ~6s, then hidden */
+.teaser-text { animation: teaser-text 240s infinite; color: var(--text); font: inherit; font-size: 0.92rem; padding: 10px 14px; white-space: nowrap; }
+/* 30s cycle: dots for ~3s, then a message for ~6s, then hidden. 8 messages take turns over 240s
+   (each delayed 30s more, inline), so the text keyframes are the 30s ones divided by 8. */
 @keyframes teaser-dots { 0%, 9% { opacity: 1; visibility: visible; } 10%, 100% { opacity: 0; visibility: hidden; } }
-@keyframes teaser-text { 0%, 10% { opacity: 0; visibility: hidden; } 11%, 30% { opacity: 1; visibility: visible; } 32%, 100% { opacity: 0; visibility: hidden; } }
+@keyframes teaser-text { 0%, 1.25% { opacity: 0; visibility: hidden; } 1.375%, 3.75% { opacity: 1; visibility: visible; } 4%, 100% { opacity: 0; visibility: hidden; } }
 @keyframes typing-dot { 0%, 60%, 100% { opacity: 0.4; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-4px); } }
 @media (prefers-reduced-motion: reduce) { .teaser-dots i, .chat-msg.typing i { animation: none; } }

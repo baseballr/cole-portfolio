@@ -33,9 +33,12 @@
         @if (!_opened)
         {
             @* Pure CSS loop: typing dots, then the prompt, every 30s. Gone after the first open. *@
-            <button class="chat-teaser" @onclick="Open" aria-label="@Teasers[_teaser]">
+            <button class="chat-teaser" @onclick="Open" aria-label="Chat with digital me">
                 <span class="teaser-dots"><i></i><i></i><i></i></span>
-                <span class="teaser-text" @onanimationiteration="NextTeaser">@Teasers[_teaser]</span>
+                @for (var i = 0; i < _teasers.Length; i++)
+                {
+                    <span class="teaser-text" style="animation-delay: @(4 + i * 30)s">@_teasers[i]</span>
+                }
             </button>
         }
         <button class="chat-bubble" @onclick="Open" aria-label="Chat with Cole">
@@ -57,6 +60,7 @@
     private string _input = "";
 
     // Kept short: the teaser is nowrap and has to fit on a phone.
+    // Each one takes a 30s turn in a pure CSS loop; the loop length in app.css (240s) assumes 8.
     private static readonly string[] Teasers =
     {
         "Want to chat with digital me?",
@@ -68,10 +72,7 @@
         "Digital Cole, reporting for duty.",
         "Skip the resume. Just ask me.",
     };
-    private int _teaser = Random.Shared.Next(Teasers.Length);
-
-    // Fires every 30s at the end of the CSS loop, while the teaser is hidden.
-    private void NextTeaser() => _teaser = (_teaser + 1) % Teasers.Length;
+    private readonly string[] _teasers = Teasers.OrderBy(_ => Random.Shared.Next()).ToArray();
 
     private void Open() => _open = _opened = true;
 
