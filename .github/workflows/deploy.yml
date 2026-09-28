@@ -37,6 +37,23 @@ jobs:
       - name: Add .nojekyll
         run: touch release/wwwroot/.nojekyll
 
+      # GitHub Pages serves /about from about.html, so a copy of index.html per route
+      # makes deep links return 200 instead of 404.html (crawlers drop 404 pages).
+      # Routes come from the @page directives, and the sitemap is built from the same list.
+      - name: Add route pages and sitemap
+        working-directory: release/wwwroot
+        run: |
+          routes=$(grep -ho '@page "/[a-z]\+"' ../../Pages/*.razor | sed 's/@page "\/\(.*\)"/\1/')
+          {
+            echo '<?xml version="1.0" encoding="UTF-8"?>'
+            echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+            for r in $routes; do
+              cp index.html "$r.html"
+              echo "  <url><loc>https://colespitzer.com/$r</loc></url>"
+            done
+            echo '</urlset>'
+          } > sitemap.xml
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
