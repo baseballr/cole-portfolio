@@ -39,8 +39,10 @@ Seasonal decor switches on automatically from the visitor's date:
 | Halloween | October | Jack-o'-lanterns, graveyard + ghost, bats, orange trees | Falling leaves |
 | Thanksgiving | November | Hay bales, scarecrow, turkey, orange trees | Falling leaves |
 | Easter | 2 weeks before Easter through Easter Monday | Hopping bunny, 6 clickable eggs to find | Rain showers |
-| Summer | June–August | Water slide into the pond, inner tubes, beach umbrella | Rain showers |
-| None | Everything else | — | Snow in Jan–Feb, otherwise rain showers |
+| New Year | January | Fireworks + banner plane ("Happy New Years!") doing a loop and barrel roll | Snow |
+| Fourth of July | July | Summer decor + fireworks + banner plane ("Happy Fourth of July!") | Rain showers |
+| Summer | June and August | Water slide into the pond, inner tubes, beach umbrella | Rain showers |
+| None | Everything else | — | Snow in February, otherwise rain showers |
 
 Cloud shadows drift across the map year-round; rain showers roll through about every 5 minutes.
 
@@ -53,6 +55,8 @@ Cloud shadows drift across the map year-round; rain showers roll through about e
 | Thanksgiving | `/colesworld?season=thanksgiving` |
 | Easter | `/colesworld?season=easter` |
 | Summer | `/colesworld?season=summer` |
+| Fourth of July | `/colesworld?season=fourth` |
+| New Year | `/colesworld?season=newyear` |
 | No decor | `/colesworld?season=none` |
 
 Combine it with `N` to see a season at night (e.g. `?season=halloween`, then press `N` twice).

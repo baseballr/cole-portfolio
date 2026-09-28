@@ -306,6 +306,7 @@
                     </div>
                     break;
                 case "summer":
+                case "fourth":
                     <div class="decor" style="left:1215px; top:1400px">
                         <svg viewBox="0 0 130 120" width="180" height="166">
                             <path d="M12 118 V44 M36 118 V44 M12 70 L36 90 M36 70 L12 90" stroke="#9aa39a" stroke-width="3" />
@@ -384,6 +385,25 @@
                     <path d="M8 26 Q8 36 20 36 H58 Q64 36 64 28 V20 H30 Q24 20 22 26 Z" fill="#d35f46" /><path d="M6 40 H60 Q66 40 66 35" stroke="#f6d18a" stroke-width="2" fill="none" />
                 </svg>
             </div>
+        }
+        @if (_season is "fourth" or "newyear")
+        {
+            @foreach (var (x, y, color, delay) in new[] { (18, 16, "#e5484d", 0), (42, 8, "#f6d18a", 900), (64, 20, "#5aa0c8", 1700), (84, 11, "#fff", 500), (30, 26, "#fff", 2300) })
+            {
+                <i class="firework" style="left:@($"{x}%"); top:@($"{y}%"); color:@color; animation-delay:@($"{delay}ms")" aria-hidden="true"></i>
+            }
+            <div class="sky-plane" aria-hidden="true"><div class="plane-loop">
+                <svg class="plane-roll" viewBox="0 0 260 40" width="260" height="40">
+                    <path d="M2 6 H150 V34 H2 L10 20 Z" fill="#fff8e6" stroke="#d35f46" stroke-width="1.5" />
+                    <text x="80" y="20" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="#2f5d8a">@(_season == "fourth" ? "Happy Fourth of July!" : "Happy New Years!")</text>
+                    <path d="M150 20 H184" stroke="#6b4329" stroke-width="1" />
+                    <path d="M186 17 L180 5 H191 L200 14 Z" fill="#e5484d" />
+                    <path d="M183 20 Q185 13 200 13 H238 Q250 14 252 20 Q250 26 238 27 H200 Q185 27 183 20 Z" fill="#f4f7f8" stroke="#5aa0c8" stroke-width="1.5" />
+                    <path d="M222 13 Q227 5 235 13 Z" fill="#bfe6f2" />
+                    <ellipse cx="218" cy="22" rx="17" ry="3.5" fill="#e5484d" />
+                    <rect class="plane-prop" x="252" y="10" width="2.5" height="20" rx="1" fill="#2a3b35" />
+                </svg>
+            </div></div>
         }
         @if (_season == "halloween")
         {
@@ -949,16 +969,16 @@
         catch (JSException) { } // storage blocked: the card just shows again next visit
     }
 
-    // Seasons follow the visitor's date; ?season=christmas|halloween|thanksgiving|easter|summer|none previews one.
+    // Seasons follow the visitor's date; ?season=christmas|halloween|thanksgiving|easter|summer|fourth|newyear|none previews one.
     [SupplyParameterFromQuery(Name = "season")] public string? SeasonQuery { get; set; }
-    private static readonly string[] Seasons = { "christmas", "halloween", "thanksgiving", "easter", "summer", "none" };
+    private static readonly string[] Seasons = { "christmas", "halloween", "thanksgiving", "easter", "summer", "fourth", "newyear", "none" };
     private string _season = "none", _weather = "rain";
 
     protected override void OnInitialized()
     {
         var today = DateTime.Today;
         _season = SeasonQuery?.ToLowerInvariant() is { } requested && Seasons.Contains(requested) ? requested : SeasonFor(today);
-        _weather = _season switch { "christmas" => "snow", "halloween" or "thanksgiving" => "leaves", _ => today.Month is 1 or 2 ? "snow" : "rain" };
+        _weather = _season switch { "christmas" or "newyear" => "snow", "halloween" or "thanksgiving" => "leaves", _ => today.Month is 1 or 2 ? "snow" : "rain" };
     }
 
     private static string SeasonFor(DateTime day)
@@ -969,6 +989,8 @@
             12 => "christmas",
             10 => "halloween",
             11 => "thanksgiving",
+            1 => "newyear",
+            7 => "fourth",
             _ when day >= easter.AddDays(-14) && day <= easter.AddDays(1) => "easter",
             6 or 7 or 8 => "summer",
             _ => "none"
