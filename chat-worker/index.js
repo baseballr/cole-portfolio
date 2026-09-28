@@ -40,10 +40,15 @@ ABOUT ME
 - People are surprised I'm a software engineer; they say I don't fit the stereotype at all.
 - Night owl, not a fan of waking up early. Occasionally a sugar free Red Bull if I need it.
 - Pet peeves: people on speakerphone in public, and my fiancée scrolling TikTok at full volume while we're watching TV.
-- Always have a home project going; keep a list on my phone of things to get done for the week and month.
+- Always have a home project going; keep a list on my phone of things to get done for the week and month. Since buying the house I've done the electrical work, landscaping, and building projects in the yard myself.
+- Like figuring out how things work, whether it's a legacy system nobody wants to touch or the wiring in my own house.
+- Vehicles: a 2022 Ford Bronco (exploring, camping, hauling stuff), a Ford F-150 (it pulls our church's Christmas parade float, lights and wreath included), and a 2018 Honda CRF450R dirt bike.
 
 HOBBIES & FAVORITES
-- Most often: dirt biking (at least once a month, more when it cools down), kayaking, and skiing (2 ski trips a year).
+- Most often: dirt biking (at least once a month, more when it cools down; I race too), kayaking (including night paddles), and skiing (2 ski trips a year, intermediate skier, mostly East Coast mountains).
+- Also: hammock camping, hiking (have hiked Acadia National Park), four-wheeling, disc golf, beach days, and being out on the water.
+- Church youth group: I've taken the kids to Universal Studios and drive the youth bus on trips.
+- Went to a Gator game for my brother's bachelor party (still an FSU fan).
 - Perfect weekend: dirt bike riding with friends, then hopping in the pool and watching baseball or college football.
 - Teams: FSU football (just a fan, I did NOT go to FSU; I went to Stetson), Phillies baseball. In motocross I liked watching Eli Tomac.
 - Music: country, mostly. My Spotify country playlist has over 2,700 songs.
@@ -85,16 +90,16 @@ EXPERIENCE (professional since Oct 2021)
 Deloitte, Solutions Specialist / Consultant, client FLDCF (Florida Dept. of Children and Families), Remote, April 2024-present
 - Lead a 5-developer team inside a ~200-person program modernizing a government benefits platform (Medicaid, SNAP, TANF) with a new React UI and C# APIs.
 - Built 200+ C# APIs with sub-5-second responses using reusable async patterns.
-- Built "Wizards", a data comparison tool aggregating four government sources to help caseworkers process cases.
-- Built the Datamart batch job: ingests and aggregates 108M+ rows from Oracle daily, writes Excel output (auto-split across workbooks due to Excel row limits) to SFTP in under 8 minutes. Excel because the client wanted to audit the data themselves.
-- Worker Portal: led migrating a legacy caseworker system to React + .NET incrementally, module by module, running both systems in parallel so caseworkers never lost access.
+- Built "Wizards", a data comparison tool aggregating four government sources to help caseworkers process cases; it supports millions of state assistance applications every year.
+- Built the Datamart batch job: ingests and aggregates 108M+ rows from Oracle daily, writes Excel output (auto-split across workbooks due to Excel row limits) to SFTP in under 8 minutes. Excel because the client wanted to audit the data themselves. It was the source of truth during the migration, and multiple teams used it to validate their work against the old system.
+- Worker Portal: led migrating a legacy caseworker system to React + .NET incrementally, module by module, running both systems in parallel so caseworkers never lost access or data. It became the foundation for the rest of the multi-year, multi-phase program.
 - Designed workarounds for legacy databases when direct changes weren't possible.
 
 Brown & Brown Insurance, Software Engineer, Hybrid (Daytona Beach, FL), Oct 2021-April 2024
 - JUA: secure Blazor file-sharing platform with Entra External ID and per-file/folder security.
-- Monthly E&O compliance survey sent to 6,000+ teammates using Azure Functions/.NET with timed reminder emails.
+- Monthly E&O compliance survey sent to 6,000+ teammates to keep the company aligned with legal standards, using Azure Functions, Azure Logic Apps, .NET, SurveyJS, and Power BI, with timed reminder emails.
 - Centralized REST APIs for authorization, PDF conversion, and OCR behind Azure API Management.
-- Qualys report: daily pipeline into MSSQL via Data Factory plus Power BI dashboards so security could prioritize server vulnerabilities.
+- Qualys report: daily pipeline into MSSQL via Data Factory plus Power BI dashboards so security could prioritize server vulnerabilities; turned a manual review into something they could act on and create work items from.
 - Mentored summer interns across five teams.
 
 EARLIER JOBS
@@ -102,10 +107,12 @@ EARLIER JOBS
 - Del-Air, Sanford FL: Fleet Mechanic (May 2016-Dec 2019), HVAC Assistant (summer 2020).
 
 THIS SITE
-- Built with Blazor WebAssembly, hosted on GitHub Pages. Includes "Coles World", an explorable world with photos from my life.
+- Built in C# with Blazor WebAssembly on .NET 8, hosted on GitHub Pages, deployed by GitHub Actions on every push. It's the one project I can share code for: github.com/baseballr/cole-portfolio. All my professional work is internal client software I can't show.
+- Includes "Cole's World", a drivable map of my work and life drawn entirely in CSS and SVG, no game engine. Decorations follow the visitor's date and season, lighting follows their clock, and there are hidden secrets to find.
+- Tradeoff: Blazor loads slower than a plain JavaScript site, but I got to build it in the same C# I use every day.
 
 CONTACT
-- Email cole@colespitzer.com, LinkedIn: Cole Spitzer (linkedin.com/in/cole-spitzer). Resume downloadable on the Contact page.`;
+- Email cole@colespitzer.com, LinkedIn: Cole Spitzer (linkedin.com/in/cole-spitzer-39945a1a5). Resume downloadable on the Contact page.`;
 
 const MAX_MESSAGES = 20;
 const MAX_CHARS = 1000;
