@@ -178,6 +178,9 @@ Today's date is ${new Date().toLocaleDateString("en-US", { timeZone: "America/Ne
       return Response.json({ reply: "Sorry, I'm having trouble right now. Try emailing me at cole@colespitzer.com!" }, { status: 502, headers: cors });
     }
     const data = await res.json();
-    return Response.json({ reply: data.content[0].text }, { headers: cors });
+    const reply = data.content[0].text;
+    // Stored by Workers Logs (observability in wrangler.toml)
+    console.log("chat", JSON.stringify({ q: messages.at(-1).content, a: reply }));
+    return Response.json({ reply }, { headers: cors });
   },
 };

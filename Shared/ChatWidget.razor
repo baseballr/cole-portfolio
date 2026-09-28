@@ -20,7 +20,7 @@
                 {
                     <div class="chat-msg @m.Role">@m.Content</div>
                 }
-                <div class="chat-msg assistant">Hey, I'm Cole (well, an AI version of me). Ask me anything about my work, projects, or background!</div>
+                <div class="chat-msg assistant">Hey, I'm Cole (well, an AI version of me). Ask me anything about my work, projects, or background! (Chats are saved so I can improve my answers.)</div>
             </div>
             <form class="chat-input" @onsubmit="Send">
                 <input @bind="_input" placeholder="Ask me something..." maxlength="1000" aria-label="Message" disabled="@_sending" />
