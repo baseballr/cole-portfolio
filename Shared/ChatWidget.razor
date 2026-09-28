@@ -1,0 +1,74 @@
+@inject HttpClient Http
+
+<div class="chat-widget">
+    @if (_open)
+    {
+        <div class="chat-panel" role="dialog" aria-label="Chat with Cole">
+            <div class="chat-header">
+                <img src="images/carousel/Cole1.jpg" alt="" />
+                <span>Chat with Cole <small>(AI)</small></span>
+                <button class="chat-close" @onclick="() => _open = false" aria-label="Close chat">&times;</button>
+            </div>
+            @* column-reverse keeps the newest message pinned to the bottom without JS *@
+            <div class="chat-messages" aria-live="polite">
+                @if (_sending)
+                {
+                    <div class="chat-msg assistant typing">...</div>
+                }
+                @foreach (var m in Enumerable.Reverse(_messages))
+                {
+                    <div class="chat-msg @m.Role">@m.Content</div>
+                }
+                <div class="chat-msg assistant">Hey, I'm Cole (well, an AI version of me). Ask me anything about my work, projects, or background!</div>
+            </div>
+            <form class="chat-input" @onsubmit="Send">
+                <input @bind="_input" placeholder="Ask me something..." maxlength="1000" aria-label="Message" disabled="@_sending" />
+                <button type="submit" disabled="@(_sending || string.IsNullOrWhiteSpace(_input))">Send</button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <button class="chat-bubble" @onclick="() => _open = true" aria-label="Chat with Cole">
+            <img src="images/carousel/Cole1.jpg" alt="" />
+        </button>
+    }
+</div>
+
+@code {
+    private const string ChatUrl = "https://cole-portfolio.colespitzer.workers.dev";
+
+    private record Message(string Role, string Content);
+    private record ChatReply(string Reply);
+
+    private readonly List<Message> _messages = new();
+    private bool _open;
+    private bool _sending;
+    private string _input = "";
+
+    private async Task Send()
+    {
+        var text = _input.Trim();
+        if (text.Length == 0 || _sending) return;
+
+        _messages.Add(new Message("user", text));
+        _input = "";
+        _sending = true;
+
+        string reply;
+        try
+        {
+            // The worker caps history at 20; an odd count keeps it starting with a user message.
+            var history = _messages.TakeLast(19);
+            var res = await Http.PostAsJsonAsync(ChatUrl, new { messages = history });
+            reply = (await res.Content.ReadFromJsonAsync<ChatReply>())?.Reply ?? throw new InvalidOperationException();
+        }
+        catch
+        {
+            reply = "Sorry, something went wrong. Try again, or email me at cole@colespitzer.com!";
+        }
+
+        _messages.Add(new Message("assistant", reply));
+        _sending = false;
+    }
+}
