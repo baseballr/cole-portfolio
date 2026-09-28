@@ -1256,8 +1256,20 @@ body:has(.world-screen) .chat-widget { display: none; }
 .chat-msg { border-radius: 12px; font-size: 0.92rem; line-height: 1.4; max-width: 85%; padding: 8px 12px; white-space: pre-wrap; }
 .chat-msg.assistant { align-self: flex-start; background: var(--accent-soft); color: var(--text); }
 .chat-msg.user { align-self: flex-end; background: var(--accent); color: #fff; }
-.chat-msg.typing { color: var(--text-muted); }
+.chat-msg.typing { display: flex; gap: 4px; padding: 12px 14px; }
 .chat-input { border-top: 1px solid var(--border); display: flex; gap: 8px; padding: 10px; }
 .chat-input input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); flex: 1; font: inherit; min-width: 0; padding: 8px 10px; }
 .chat-input button { background: var(--accent); border: none; border-radius: 8px; color: #fff; cursor: pointer; font: inherit; padding: 8px 14px; }
 .chat-input button:disabled { cursor: default; opacity: 0.5; }
+.chat-teaser { background: none; border: none; bottom: 70px; cursor: pointer; padding: 0; position: absolute; right: 0; }
+.teaser-dots, .teaser-text { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 18px 18px 4px 18px; bottom: 0; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); opacity: 0; position: absolute; right: 0; visibility: hidden; }
+.teaser-dots { animation: teaser-dots 30s 4s infinite; display: flex; gap: 4px; padding: 12px 14px; }
+.teaser-dots i, .chat-msg.typing i { animation: typing-dot 1.2s infinite; background: var(--text-muted); border-radius: 50%; height: 8px; width: 8px; }
+.teaser-dots i:nth-child(2), .chat-msg.typing i:nth-child(2) { animation-delay: 0.2s; }
+.teaser-dots i:nth-child(3), .chat-msg.typing i:nth-child(3) { animation-delay: 0.4s; }
+.teaser-text { animation: teaser-text 30s 4s infinite; color: var(--text); font: inherit; font-size: 0.92rem; padding: 10px 14px; white-space: nowrap; }
+/* 30s cycle: dots for ~3s, then the message for ~6s, then hidden */
+@keyframes teaser-dots { 0%, 9% { opacity: 1; visibility: visible; } 10%, 100% { opacity: 0; visibility: hidden; } }
+@keyframes teaser-text { 0%, 10% { opacity: 0; visibility: hidden; } 11%, 30% { opacity: 1; visibility: visible; } 32%, 100% { opacity: 0; visibility: hidden; } }
+@keyframes typing-dot { 0%, 60%, 100% { opacity: 0.4; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .teaser-dots i, .chat-msg.typing i { animation: none; } }

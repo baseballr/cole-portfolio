@@ -5,7 +5,7 @@
     {
         <div class="chat-panel" role="dialog" aria-label="Chat with Cole">
             <div class="chat-header">
-                <img src="images/carousel/Cole1.jpg" alt="" />
+                <img src="images/chat-avatar.jpg" alt="" />
                 <span>Chat with Cole <small>(AI)</small></span>
                 <button class="chat-close" @onclick="() => _open = false" aria-label="Close chat">&times;</button>
             </div>
@@ -13,7 +13,7 @@
             <div class="chat-messages" aria-live="polite">
                 @if (_sending)
                 {
-                    <div class="chat-msg assistant typing">...</div>
+                    <div class="chat-msg assistant typing" aria-label="Cole is typing"><i></i><i></i><i></i></div>
                 }
                 @foreach (var m in Enumerable.Reverse(_messages))
                 {
@@ -29,8 +29,16 @@
     }
     else
     {
-        <button class="chat-bubble" @onclick="() => _open = true" aria-label="Chat with Cole">
-            <img src="images/carousel/Cole1.jpg" alt="" />
+        @if (!_opened)
+        {
+            @* Pure CSS loop: typing dots, then the prompt, every 30s. Gone after the first open. *@
+            <button class="chat-teaser" @onclick="Open" aria-label="Want to chat with digital me?">
+                <span class="teaser-dots"><i></i><i></i><i></i></span>
+                <span class="teaser-text">Want to chat with digital me?</span>
+            </button>
+        }
+        <button class="chat-bubble" @onclick="Open" aria-label="Chat with Cole">
+            <img src="images/chat-avatar.jpg" alt="" />
         </button>
     }
 </div>
@@ -43,8 +51,11 @@
 
     private readonly List<Message> _messages = new();
     private bool _open;
+    private bool _opened;
     private bool _sending;
     private string _input = "";
+
+    private void Open() => _open = _opened = true;
 
     private async Task Send()
     {
